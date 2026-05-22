@@ -6,6 +6,9 @@ import '../../app/extensions/spacing_extension.dart';
 import '../../app/router/app_tab.dart';
 import '../../app/theme/app_theme.dart';
 import '../../models/mock_models.dart';
+import 'navigation/app_bottom_nav_bar.dart';
+
+export 'navigation/app_bottom_nav_bar.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   const AppTopBar({
@@ -63,65 +66,6 @@ class MainShellPage extends StatelessWidget {
       body: child,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: AppBottomNavBar(activeTab: activeTab),
-    );
-  }
-}
-
-class AppBottomNavBar extends StatelessWidget {
-  const AppBottomNavBar({super.key, required this.activeTab});
-
-  final AppTab activeTab;
-  static const _contentHeight = 66.0;
-  static const _iconSize = 19.0;
-  static const _labelSize = 11.0;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        height: _contentHeight,
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceAlt,
-          border: Border(top: BorderSide(color: AppColors.border)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children:
-              AppTab.values.map((tab) {
-                final isActive = tab == activeTab;
-
-                return Expanded(
-                  child: InkWell(
-                    onTap: () => context.goNamed(tab.page.name),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          tab.icon,
-                          size: _iconSize,
-                          color: isActive ? AppColors.ink : AppColors.muted,
-                        ),
-                        3.heightBox,
-                        Text(
-                          tab.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isActive ? AppColors.ink : AppColors.muted,
-                            fontSize: _labelSize,
-                            fontWeight: FontWeight.w400,
-                            height: 1.33,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-        ),
-      ),
     );
   }
 }

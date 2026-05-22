@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
+import '../../../app/router/app_tab.dart';
+import '../../common/navigation/app_bottom_nav_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,59 +14,39 @@ class HomePage extends StatelessWidget {
   static const _ink = Color(0xFF1C1B1C);
   static const _title = Color(0xFF393C43);
   static const _body = Color(0xFF45474B);
-  static const _navText = Color(0xFF616365);
   static const _surfaceAlt = Color(0xFFF0EDED);
   static const _border = Color(0xFFC6C6CB);
   static const _danger = Color(0xFFBA1A1A);
-  static const _bottomNavContentHeight = 66.0;
 
   @override
   Widget build(BuildContext context) {
-    final heroHeight = (480 - MediaQuery.viewPaddingOf(context).top).clamp(
-      420,
-      480,
+    final heroHeight = (MediaQuery.sizeOf(context).height * 0.39).clamp(
+      300.0,
+      370.0,
     );
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final navHeight = _bottomNavContentHeight + bottomInset;
 
     return Scaffold(
       backgroundColor: _background,
+      floatingActionButton: _FloatingReportButton(
+        onTap: () => context.pushNamed(AppPage.communityWrite.name),
+      ),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.home),
       body: SafeArea(
         bottom: false,
-        child: Stack(
+        child: Column(
           children: [
-            Column(
-              children: [
-                const _HomeHeader(),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.only(bottom: navHeight + 40),
-                    children: [
-                      _HeroSection(height: heroHeight.toDouble()),
-                      const SizedBox(height: 32),
-                      const _QuickMenu(),
-                      const SizedBox(height: 32),
-                      const _TrendingSection(),
-                      const _ClosingSection(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              right: 20,
-              bottom: navHeight + 8,
-              child: _FloatingReportButton(
-                onTap: () => context.pushNamed(AppPage.communityWrite.name),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _FigmaBottomNav(
-                height: navHeight,
-                bottomInset: bottomInset,
+            const _HomeHeader(),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: 40),
+                children: [
+                  _HeroSection(height: heroHeight.toDouble()),
+                  const SizedBox(height: 32),
+                  const _QuickMenu(),
+                  const SizedBox(height: 32),
+                  const _TrendingSection(),
+                  const _ClosingSection(),
+                ],
               ),
             ),
           ],
@@ -202,7 +184,9 @@ class _HeroSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    '성수동 팝업: 더 모던 테라\n스',
+                    '성수동 팝업:\n더 모던 테라스',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 32,
@@ -272,29 +256,36 @@ class _QuickMenu extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
-        height: 76.5,
+        height: 74,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _QuickAction(
-              icon: AppAssets.homeQuickCalendar,
-              label: '팝업 캘린더',
-              route: AppPage.calendar,
+            Expanded(
+              child: _QuickAction(
+                icon: AppAssets.homeQuickCalendar,
+                label: '팝업 캘린더',
+                route: AppPage.calendar,
+              ),
             ),
-            _QuickAction(
-              icon: AppAssets.homeQuickNearby,
-              label: '내 주변 팝업',
-              route: AppPage.map,
+            Expanded(
+              child: _QuickAction(
+                icon: AppAssets.homeQuickNearby,
+                label: '내 주변 팝업',
+                route: AppPage.map,
+              ),
             ),
-            _QuickAction(
-              icon: AppAssets.homeQuickRegion,
-              label: '지역별 팝업',
-              route: AppPage.search,
+            Expanded(
+              child: _QuickAction(
+                icon: AppAssets.homeQuickRegion,
+                label: '지역별 팝업',
+                route: AppPage.search,
+              ),
             ),
-            _QuickAction(
-              icon: AppAssets.homeQuickGenre,
-              label: '장르별 팝업',
-              route: AppPage.search,
+            Expanded(
+              child: _QuickAction(
+                icon: AppAssets.homeQuickGenre,
+                label: '장르별 팝업',
+                route: AppPage.search,
+              ),
             ),
           ],
         ),
@@ -319,32 +310,31 @@ class _QuickAction extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.goNamed(route.name),
       child: SizedBox(
-        width: 78.5,
+        width: double.infinity,
         child: Column(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
                 color: HomePage._surfaceAlt,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: HomePage._border),
+                borderRadius: BorderRadius.circular(18),
               ),
               child: Center(
-                child: SvgPicture.asset(icon, width: 24, height: 24),
+                child: SvgPicture.asset(icon, width: 26, height: 26),
               ),
             ),
-            const SizedBox(height: 7.5),
+            const SizedBox(height: 8),
             Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: HomePage._body,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                height: 12.5 / 10,
+                color: HomePage._ink,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 18 / 12,
               ),
             ),
           ],
@@ -719,107 +709,6 @@ class _FloatingReportButton extends StatelessWidget {
             height: 18,
             colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FigmaBottomNav extends StatelessWidget {
-  const _FigmaBottomNav({required this.height, required this.bottomInset});
-
-  final double height;
-  final double bottomInset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: const BoxDecoration(
-        color: HomePage._surfaceAlt,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-        border: Border(top: BorderSide(color: HomePage._border)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(top: 6, bottom: bottomInset),
-        child: Row(
-          children: [
-            _NavItem(
-              icon: AppAssets.homeNavSearch,
-              label: '검색',
-              onTap: () => context.goNamed(AppPage.search.name),
-            ),
-            _NavItem(
-              icon: AppAssets.homeNavMap,
-              label: '지도',
-              onTap: () => context.goNamed(AppPage.map.name),
-            ),
-            _NavItem(
-              icon: AppAssets.homeNavHome,
-              label: '홈',
-              active: true,
-              onTap: () => context.goNamed(AppPage.home.name),
-            ),
-            _NavItem(
-              icon: AppAssets.homeNavCommunity,
-              label: '커뮤니티',
-              onTap: () => context.goNamed(AppPage.community.name),
-            ),
-            _NavItem(
-              icon: AppAssets.homeNavProfile,
-              label: '마이페이지',
-              onTap: () => context.goNamed(AppPage.profile.name),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.active = false,
-  });
-
-  final String icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 40,
-              height: 28,
-              child: Center(
-                child: SvgPicture.asset(icon, width: 19, height: 19),
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: active ? HomePage._title : HomePage._navText,
-                fontSize: 11,
-                fontWeight: FontWeight.w400,
-                height: 1.33,
-                letterSpacing: 0,
-              ),
-            ),
-          ],
         ),
       ),
     );

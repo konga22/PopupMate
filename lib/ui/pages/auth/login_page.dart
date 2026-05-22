@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
+import '../../../app/theme/app_theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,12 +16,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static const _background = Color(0xFFFCF8F9);
-  static const _ink = Color(0xFF1C1B1C);
-  static const _title = Color(0xFF393C43);
-  static const _body = Color(0xFF45474B);
-  static const _muted = Color(0xFF76777B);
-  static const _border = Color(0xFFC6C6CB);
+  static const _kakaoBackground = Color(0xFFFEE500);
+  static const _kakaoText = Color(0xFF191919);
+  static const _appleBackground = Color(0xFF1C1B1C);
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -44,173 +42,200 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
-      body: Stack(
-        children: [
-          Positioned(
-            left: -160,
-            bottom: -18,
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-              child: Container(
-                width: 320,
-                height: 320,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4C3B8).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(160),
+      backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isShortScreen = constraints.maxHeight < 700;
+          final isMediumScreen = constraints.maxHeight < 860;
+          final horizontalPadding = constraints.maxWidth < 360 ? 16.0 : 20.0;
+          final headerHeight = isShortScreen ? 56.0 : 64.0;
+          final scrollTopPadding = isShortScreen ? 16.0 : 32.0;
+          final titleTopGap =
+              isShortScreen ? 24.0 : (isMediumScreen ? 40.0 : 64.0);
+          final sectionGap =
+              isShortScreen ? 28.0 : (isMediumScreen ? 36.0 : 48.0);
+          final fieldGap =
+              isShortScreen ? 20.0 : (isMediumScreen ? 22.0 : 24.0);
+          final bottomPadding = 16.0 + MediaQuery.viewInsetsOf(context).bottom;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: -160,
+                bottom: -18,
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+                  child: Container(
+                    width: 320,
+                    height: 320,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD4C3B8).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(160),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 64,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'PopupMate',
-                          style: TextStyle(
-                            color: _title,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            height: 32 / 24,
-                            letterSpacing: -0.24,
-                          ),
+              SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: headerHeight,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                          vertical: 8,
                         ),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () {
-                            if (context.canPop()) {
-                              context.pop();
-                              return;
-                            }
-                            context.goNamed(AppPage.onboarding.name);
-                          },
-                          icon: SvgPicture.asset(
-                            AppAssets.loginClose,
-                            width: 16.4,
-                            height: 16.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 64),
-                        const Text(
-                          '반갑습니다!',
-                          style: TextStyle(
-                            color: _ink,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w500,
-                            height: 40 / 32,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const SizedBox(
-                          width: 328,
-                          child: Text(
-                            '로그인하여 당신만의 팝업 큐레이션을 시작해보세요.',
-                            style: TextStyle(
-                              color: _body,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              height: 24 / 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 48),
-                        _SocialButton(
-                          label: '카카오로 시작하기',
-                          backgroundColor: const Color(0xFFFEE500),
-                          textColor: const Color(0xFF191919),
-                          icon: AppAssets.loginKakao,
-                          iconSize: 20,
-                          onPressed: _onLogin,
-                        ),
-                        const SizedBox(height: 16),
-                        _SocialButton(
-                          label: 'Apple로 로그인',
-                          backgroundColor: _ink,
-                          textColor: Colors.white,
-                          icon: AppAssets.loginApple,
-                          iconSize: 18,
-                          iconColor: Colors.white,
-                          onPressed: _onLogin,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        const SizedBox(height: 48),
-                        const _DividerWithText(),
-                        const SizedBox(height: 48),
-                        _FigmaTextField(
-                          label: '이메일 주소',
-                          hint: 'example@email.com',
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        const SizedBox(height: 24),
-                        _FigmaTextField(
-                          label: '비밀번호',
-                          hint: '비밀번호를 입력하세요',
-                          controller: _passwordController,
-                          obscureText: true,
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: _loading ? null : _onLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _title,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: _title,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                height: 24 / 16,
+                        child: Row(
+                          children: [
+                            const Text(
+                              'PopupMate',
+                              style: TextStyle(
+                                color: AppColors.ink,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                height: 32 / 24,
+                                letterSpacing: 0,
                               ),
                             ),
-                            child:
-                                _loading
-                                    ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
+                            const Spacer(),
+                            IconButton(
+                              onPressed: () {
+                                if (context.canPop()) {
+                                  context.pop();
+                                  return;
+                                }
+                                context.goNamed(AppPage.onboarding.name);
+                              },
+                              icon: SvgPicture.asset(
+                                AppAssets.loginClose,
+                                width: 16.4,
+                                height: 16.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        padding: EdgeInsets.fromLTRB(
+                          horizontalPadding,
+                          scrollTopPadding,
+                          horizontalPadding,
+                          bottomPadding,
+                        ),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 420),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: titleTopGap),
+                                const Text(
+                                  '반갑습니다!',
+                                  style: TextStyle(
+                                    color: AppColors.ink,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w500,
+                                    height: 40 / 32,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  '로그인하여 당신만의 팝업 큐레이션을 시작해보세요.',
+                                  style: TextStyle(
+                                    color: AppColors.body,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    height: 24 / 16,
+                                  ),
+                                ),
+                                SizedBox(height: sectionGap),
+                                _SocialButton(
+                                  label: '카카오로 시작하기',
+                                  backgroundColor: _kakaoBackground,
+                                  textColor: _kakaoText,
+                                  icon: AppAssets.loginKakao,
+                                  iconSize: 20,
+                                  onPressed: _onLogin,
+                                ),
+                                const SizedBox(height: 16),
+                                _SocialButton(
+                                  label: 'Apple로 로그인',
+                                  backgroundColor: _appleBackground,
+                                  textColor: Colors.white,
+                                  icon: AppAssets.loginApple,
+                                  iconSize: 18,
+                                  iconColor: Colors.white,
+                                  onPressed: _onLogin,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                SizedBox(height: sectionGap),
+                                const _DividerWithText(),
+                                SizedBox(height: sectionGap),
+                                _FigmaTextField(
+                                  label: '이메일 주소',
+                                  hint: 'example@email.com',
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+                                SizedBox(height: fieldGap),
+                                _FigmaTextField(
+                                  label: '비밀번호',
+                                  hint: '비밀번호를 입력하세요',
+                                  controller: _passwordController,
+                                  obscureText: true,
+                                ),
+                                SizedBox(height: fieldGap),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 56,
+                                  child: ElevatedButton(
+                                    onPressed: _loading ? null : _onLogin,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.ink,
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor: AppColors.ink,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                    )
-                                    : const Text('로그인'),
+                                      textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        height: 24 / 16,
+                                      ),
+                                    ),
+                                    child:
+                                        _loading
+                                            ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                            : const Text('로그인'),
+                                  ),
+                                ),
+                                SizedBox(height: sectionGap),
+                                const _LoginLinks(),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 48),
-                        const _LoginLinks(),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -292,13 +317,13 @@ class _DividerWithText extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        Expanded(child: Divider(color: _LoginPageState._border, height: 1)),
+        Expanded(child: Divider(color: AppColors.border, height: 1)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'OR',
             style: TextStyle(
-              color: _LoginPageState._muted,
+              color: AppColors.muted,
               fontSize: 12,
               fontWeight: FontWeight.w700,
               height: 16 / 12,
@@ -306,7 +331,7 @@ class _DividerWithText extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Divider(color: _LoginPageState._border, height: 1)),
+        Expanded(child: Divider(color: AppColors.border, height: 1)),
       ],
     );
   }
@@ -335,7 +360,7 @@ class _FigmaTextField extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: _LoginPageState._muted,
+            color: AppColors.muted,
             fontSize: 12,
             fontWeight: FontWeight.w500,
             height: 16 / 12,
@@ -349,9 +374,9 @@ class _FigmaTextField extends StatelessWidget {
             controller: controller,
             obscureText: obscureText,
             keyboardType: keyboardType,
-            cursorColor: _LoginPageState._title,
+            cursorColor: AppColors.ink,
             style: const TextStyle(
-              color: _LoginPageState._ink,
+              color: AppColors.ink,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 24 / 16,
@@ -359,28 +384,28 @@ class _FigmaTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: const TextStyle(
-                color: _LoginPageState._border,
+                color: AppColors.border,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 24 / 16,
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.surface,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 18,
                 vertical: 16,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: _LoginPageState._border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: _LoginPageState._border),
+                borderSide: const BorderSide(color: AppColors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: _LoginPageState._title),
+                borderSide: const BorderSide(color: AppColors.ink),
               ),
             ),
           ),
@@ -406,7 +431,7 @@ class _LoginLinks extends StatelessWidget {
             height: 4,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: _LoginPageState._border,
+                color: AppColors.border,
                 shape: BoxShape.circle,
               ),
             ),
@@ -431,7 +456,7 @@ class _FooterLink extends StatelessWidget {
       child: Text(
         label,
         style: const TextStyle(
-          color: _LoginPageState._body,
+          color: AppColors.body,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           height: 20 / 14,

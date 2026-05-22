@@ -9,7 +9,7 @@ class AppAssets {
   static const loginClose = 'assets/images/login_close.png';
 
   static const homeProfile = 'assets/images/home_profile.png';
-  static const homeHero = 'assets/images/home_hero.png';
+  static const homeHero = 'assets/images/home_hero_popup.jpg';
   static const homeTrendingOne = 'assets/images/home_trending_1.png';
   static const homeTrendingTwo = 'assets/images/home_trending_2.png';
   static const homeClosingOne = 'assets/images/home_closing_1.png';
