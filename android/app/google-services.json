@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "332112843208",
+    "project_id": "popupmate-cff31",
+    "storage_bucket": "popupmate-cff31.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332112843208:android:ac5dc3ed69abee8cfff0fd",
+        "android_client_info": {
+          "package_name": "com.konga22.popupmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy9MTBTOkJEv-5r1x0qAquUDdoFXZtXDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
