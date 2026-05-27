@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../../app/theme/app_theme.dart';
+import 'search_result_image.dart';
+import 'search_result_location_row.dart';
 
 class SearchResultCard extends StatelessWidget {
   const SearchResultCard({
@@ -29,44 +29,10 @@ class SearchResultCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Stack(
-              children: [
-                SizedBox(
-                  height: 197,
-                  width: double.infinity,
-                  child: Image.asset(
-                    image,
-                    fit: BoxFit.cover,
-                    alignment: imageAlignment,
-                  ),
-                ),
-                Positioned(
-                  right: 16,
-                  top: 11,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.ink.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      badge,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        height: 1.33,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          SearchResultImage(
+            image: image,
+            badge: badge,
+            imageAlignment: imageAlignment,
           ),
           const SizedBox(height: 16),
           Text(
@@ -81,25 +47,7 @@ class SearchResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(LucideIcons.mapPin, color: AppColors.body, size: 13),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  address,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF45474B),
-                    fontSize: 14,
-                    height: 1.43,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          SearchResultLocationRow(address: address),
         ],
       ),
     );
