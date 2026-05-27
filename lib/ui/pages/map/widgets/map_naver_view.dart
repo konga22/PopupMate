@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../models/map_mock_data.dart';
 
+const _naverMapClientId = String.fromEnvironment('NAVER_MAP_CLIENT_ID');
+
 class MapNaverView extends StatefulWidget {
   final NLatLng center;
   final double radius;
@@ -173,6 +175,18 @@ class _MapNaverViewState extends State<MapNaverView> {
 
   @override
   Widget build(BuildContext context) {
+    if (_naverMapClientId.isEmpty) {
+      return const ColoredBox(
+        color: AppColors.surfaceAlt,
+        child: Center(
+          child: Text(
+            '네이버 지도 키가 설정되지 않았습니다.',
+            style: TextStyle(color: AppColors.body),
+          ),
+        ),
+      );
+    }
+
     return NaverMap(
       options: NaverMapViewOptions(
         initialCameraPosition: NCameraPosition(
@@ -180,10 +194,7 @@ class _MapNaverViewState extends State<MapNaverView> {
           zoom: _getZoomLevelForRadius(widget.radius),
         ),
         mapType: NMapType.basic,
-        activeLayerGroups: const [
-          NLayerGroup.building,
-          NLayerGroup.transit,
-        ],
+        activeLayerGroups: const [NLayerGroup.building, NLayerGroup.transit],
       ),
       onMapReady: _onMapReady,
     );

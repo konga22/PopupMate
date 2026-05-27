@@ -116,7 +116,7 @@ class _MapPageState extends State<MapPage> {
                       },
                     ),
                   ),
-                  
+
                   // 2. 지도 위의 상단 검색창 및 컨트롤들
                   Positioned(
                     left: 20,
@@ -189,11 +189,15 @@ class _MapPageState extends State<MapPage> {
                           onCurrentLocationTap: () async {
                             try {
                               context.showSnackbar('위치 정보를 가져오는 중...');
-                              final position = await LocationService.getCurrentPosition();
+                              final position =
+                                  await LocationService.getCurrentPosition();
 
                               if (!context.mounted) return;
                               setState(() {
-                                _currentCenter = NLatLng(position.latitude, position.longitude);
+                                _currentCenter = NLatLng(
+                                  position.latitude,
+                                  position.longitude,
+                                );
                                 _radius = 500;
                               });
                               context.showSnackbar(
@@ -210,7 +214,7 @@ class _MapPageState extends State<MapPage> {
                       ],
                     ),
                   ),
-                  
+
                   // 3. 지도 위의 하단 프리뷰 카드
                   if (_selectedPopup != null)
                     Positioned(

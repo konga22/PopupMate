@@ -19,7 +19,7 @@ PopupMate는 한국의 팝업 스토어를 탐색, 저장, 공유하는 모바�
 flutter pub get
 flutter analyze
 flutter test
-flutter run
+flutter run --dart-define=NAVER_MAP_CLIENT_ID=네이버_지도_Client_ID
 ```
 
 iOS Simulator:
@@ -92,6 +92,20 @@ git diff --check
 - **테두리 박스 고정**: 네모 박스의 테두리는 상태 변화 없이 기존 테두리 색상(`AppColors.border`)을 유지하도록 고정
 
 ### 🔒 보안 및 버전 관리 설정
-- **환경 변수 파일 보호**: 네이버 지도 API Client ID 등을 정의한 `.env` 파일을 `.gitignore`에 등록하여 GitHub에 키 유출 방지 조치
+- **네이버 지도 Client ID 주입 방식**: `.env` 파일 대신 `--dart-define=NAVER_MAP_CLIENT_ID=...`로 실행 시점에 값을 전달
+- **GitHub Actions Secret 사용**: CI에서는 `secrets.NAVER_MAP_CLIENT_ID` 값을 `--dart-define`으로 전달
 - **브랜치 업로드**: `team/kwanhyeak0304/map-setup` 브랜치를 원격 저장소(`kwanhyeak0304/PopupMate`)에 커밋 및 푸시 완료
 
+#### 로컬 실행
+
+```bash
+flutter run --dart-define=NAVER_MAP_CLIENT_ID=네이버_지도_Client_ID
+```
+
+#### GitHub Actions 실행 예시
+
+```bash
+flutter analyze
+flutter test --dart-define=NAVER_MAP_CLIENT_ID=${{ secrets.NAVER_MAP_CLIENT_ID }}
+flutter build apk --dart-define=NAVER_MAP_CLIENT_ID=${{ secrets.NAVER_MAP_CLIENT_ID }}
+```

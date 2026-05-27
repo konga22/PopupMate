@@ -76,9 +76,10 @@ class _RadiusDropdown extends StatelessWidget {
               height: 36,
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              color: isSelected
-                  ? AppColors.surfaceAlt.withValues(alpha: 0.5)
-                  : Colors.transparent,
+              color:
+                  isSelected
+                      ? AppColors.surfaceAlt.withValues(alpha: 0.5)
+                      : Colors.transparent,
               child: Text(
                 optionLabel,
                 maxLines: 1,
