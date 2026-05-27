@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
-import '../../../app/router/app_tab.dart';
-import '../../common/navigation/app_bottom_nav_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,39 +12,58 @@ class HomePage extends StatelessWidget {
   static const _ink = Color(0xFF1C1B1C);
   static const _title = Color(0xFF393C43);
   static const _body = Color(0xFF45474B);
+  static const _navText = Color(0xFF616365);
   static const _surfaceAlt = Color(0xFFF0EDED);
   static const _border = Color(0xFFC6C6CB);
   static const _danger = Color(0xFFBA1A1A);
 
   @override
   Widget build(BuildContext context) {
-    final heroHeight = (MediaQuery.sizeOf(context).height * 0.39).clamp(
-      300.0,
-      370.0,
+    final heroHeight = (480 - MediaQuery.viewPaddingOf(context).top).clamp(
+      420,
+      480,
     );
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final navHeight = 102.0 + bottomInset;
 
     return Scaffold(
       backgroundColor: _background,
-      floatingActionButton: _FloatingReportButton(
-        onTap: () => context.pushNamed(AppPage.communityWrite.name),
-      ),
-      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.home),
       body: SafeArea(
         bottom: false,
-        child: Column(
+        child: Stack(
           children: [
-            const _HomeHeader(),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 40),
-                children: [
-                  _HeroSection(height: heroHeight.toDouble()),
-                  const SizedBox(height: 32),
-                  const _QuickMenu(),
-                  const SizedBox(height: 32),
-                  const _TrendingSection(),
-                  const _ClosingSection(),
-                ],
+            Column(
+              children: [
+                const _HomeHeader(),
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.only(bottom: navHeight + 40),
+                    children: [
+                      _HeroSection(height: heroHeight.toDouble()),
+                      const SizedBox(height: 32),
+                      const _QuickMenu(),
+                      const SizedBox(height: 32),
+                      const _TrendingSection(),
+                      const _ClosingSection(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              right: 20,
+              bottom: navHeight + 8,
+              child: _FloatingReportButton(
+                onTap: () => context.pushNamed(AppPage.communityWrite.name),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: _FigmaBottomNav(
+                height: navHeight,
+                bottomInset: bottomInset,
               ),
             ),
           ],
@@ -84,10 +101,10 @@ class _HomeHeader extends StatelessWidget {
                 width: 32,
                 height: 32,
                 child: Center(
-                  child: SvgPicture.asset(
-                    AppAssets.homeHeaderSearch,
-                    width: 18,
-                    height: 18,
+                  child: Icon(
+                    LucideIcons.search,
+                    color: HomePage._title,
+                    size: 24,
                   ),
                 ),
               ),
@@ -185,8 +202,6 @@ class _HeroSection extends StatelessWidget {
                   const SizedBox(height: 12),
                   const Text(
                     '성수동 팝업:\n더 모던 테라스',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 32,
@@ -256,36 +271,29 @@ class _QuickMenu extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
-        height: 74,
+        height: 76.5,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: _QuickAction(
-                icon: AppAssets.homeQuickCalendar,
-                label: '팝업 캘린더',
-                route: AppPage.calendar,
-              ),
+            _QuickAction(
+              icon: LucideIcons.calendarDays,
+              label: '팝업 캘린더',
+              route: AppPage.calendar,
             ),
-            Expanded(
-              child: _QuickAction(
-                icon: AppAssets.homeQuickNearby,
-                label: '내 주변 팝업',
-                route: AppPage.map,
-              ),
+            _QuickAction(
+              icon: LucideIcons.navigation,
+              label: '내 주변 팝업',
+              route: AppPage.map,
             ),
-            Expanded(
-              child: _QuickAction(
-                icon: AppAssets.homeQuickRegion,
-                label: '지역별 팝업',
-                route: AppPage.search,
-              ),
+            _QuickAction(
+              icon: LucideIcons.map,
+              label: '지역별 팝업',
+              route: AppPage.search,
             ),
-            Expanded(
-              child: _QuickAction(
-                icon: AppAssets.homeQuickGenre,
-                label: '장르별 팝업',
-                route: AppPage.search,
-              ),
+            _QuickAction(
+              icon: LucideIcons.shapes,
+              label: '장르별 팝업',
+              route: AppPage.search,
             ),
           ],
         ),
@@ -301,7 +309,7 @@ class _QuickAction extends StatelessWidget {
     required this.route,
   });
 
-  final String icon;
+  final IconData icon;
   final String label;
   final AppPage route;
 
@@ -310,31 +318,32 @@ class _QuickAction extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.goNamed(route.name),
       child: SizedBox(
-        width: double.infinity,
+        width: 78.5,
         child: Column(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
                 color: HomePage._surfaceAlt,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: HomePage._border),
               ),
               child: Center(
-                child: SvgPicture.asset(icon, width: 26, height: 26),
+                child: Icon(icon, color: HomePage._title, size: 30),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7.5),
             Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: HomePage._ink,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                height: 18 / 12,
+                color: HomePage._body,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                height: 12.5 / 10,
               ),
             ),
           ],
@@ -480,10 +489,10 @@ class _TrendingCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          AppAssets.homeHot,
-                          width: 10.7,
-                          height: 12,
+                        Icon(
+                          LucideIcons.flame,
+                          color: HomePage._danger,
+                          size: 13,
                         ),
                         const SizedBox(width: 4),
                         const Text(
@@ -702,13 +711,119 @@ class _FloatingReportButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(
-          child: SvgPicture.asset(
-            AppAssets.homeFabPlus,
-            width: 18,
-            height: 18,
-            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-          ),
+        child: const Center(
+          child: Icon(LucideIcons.plus, color: Colors.white, size: 30),
+        ),
+      ),
+    );
+  }
+}
+
+class _FigmaBottomNav extends StatelessWidget {
+  const _FigmaBottomNav({required this.height, required this.bottomInset});
+
+  final double height;
+  final double bottomInset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: const BoxDecoration(
+        color: HomePage._surfaceAlt,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+        border: Border(top: BorderSide(color: HomePage._border)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(top: 20.5, bottom: bottomInset),
+        child: Row(
+          children: [
+            _NavItem(
+              icon: LucideIcons.search,
+              label: '검색',
+              onTap: () => context.goNamed(AppPage.search.name),
+            ),
+            _NavItem(
+              icon: LucideIcons.map,
+              label: '지도',
+              onTap: () => context.goNamed(AppPage.map.name),
+            ),
+            _NavItem(
+              icon: LucideIcons.house,
+              label: '홈',
+              active: true,
+              onTap: () => context.goNamed(AppPage.home.name),
+            ),
+            _NavItem(
+              icon: LucideIcons.messageCircle,
+              label: '커뮤니티',
+              onTap: () => context.goNamed(AppPage.community.name),
+            ),
+            _NavItem(
+              icon: LucideIcons.user,
+              label: '프로필',
+              onTap: () => context.goNamed(AppPage.profile.name),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.active = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 44,
+              height: 34,
+              child: Center(
+                child:
+                    active
+                        ? Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: HomePage._title,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(icon, color: Colors.white, size: 20),
+                        )
+                        : Icon(icon, color: HomePage._navText, size: 30),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: active ? HomePage._title : HomePage._navText,
+                fontSize: 10,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                height: 15 / 10,
+              ),
+            ),
+          ],
         ),
       ),
     );
