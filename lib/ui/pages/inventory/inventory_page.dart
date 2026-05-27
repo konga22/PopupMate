@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/extensions/spacing_extension.dart';
-import '../../../app/theme/app_theme.dart';
 import '../../../services/mock_popup_service.dart';
 import '../../common/app_components.dart';
+import 'widgets/inventory_category_filter.dart';
+import 'widgets/inventory_product_list.dart';
+import 'widgets/inventory_search_field.dart';
 
 class InventoryPage extends StatefulWidget {
   const InventoryPage({super.key});
@@ -25,43 +26,14 @@ class _InventoryPageState extends State<InventoryPage> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
         children: [
-          const TextField(
-            decoration: InputDecoration(
-              prefixIcon: Icon(LucideIcons.search),
-              hintText: '상품명을 입력하세요',
-            ),
-          ),
+          const InventorySearchField(),
           16.heightBox,
-          FilterChipBar(
-            labels: const ['전체', '의류', '액세서리', '리빙', '여유', '품절 임박', '품절'],
+          InventoryCategoryFilter(
             selected: _category,
             onSelected: (value) => setState(() => _category = value),
           ),
           24.heightBox,
-          ...products.map(
-            (product) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                tileColor: AppColors.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: AppColors.softBorder),
-                ),
-                leading: const Icon(LucideIcons.package),
-                title: Text(product.name),
-                subtitle: Text('${product.category} · ${product.price}'),
-                trailing: StatusBadge(
-                  label: product.status,
-                  tone:
-                      product.status == '품절'
-                          ? BadgeTone.danger
-                          : product.status == '품절 임박'
-                          ? BadgeTone.warning
-                          : BadgeTone.success,
-                ),
-              ),
-            ),
-          ),
+          InventoryProductList(products: products),
         ],
       ),
     );
