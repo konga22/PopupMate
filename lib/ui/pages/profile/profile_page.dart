@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -15,6 +16,10 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = MockProfileService.me;
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName ?? profile.name;
+    final photoUrl = user?.photoURL;
+    final email = user?.email ?? profile.handle;
 
     return MainShellPage(
       activeTab: AppTab.profile,
@@ -30,10 +35,15 @@ class ProfilePage extends StatelessWidget {
         children: [
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 36,
                 backgroundColor: AppColors.surfaceAlt,
-                child: Icon(LucideIcons.user, color: AppColors.ink, size: 34),
+                backgroundImage:
+                    photoUrl != null ? NetworkImage(photoUrl) : null,
+                child:
+                    photoUrl == null
+                        ? const Icon(LucideIcons.user, color: AppColors.ink, size: 34)
+                        : null,
               ),
               16.widthBox,
               Expanded(
@@ -41,7 +51,7 @@ class ProfilePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      profile.name,
+                      displayName,
                       style: const TextStyle(
                         color: AppColors.ink,
                         fontSize: 24,
@@ -49,7 +59,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      profile.handle,
+                      email,
                       style: const TextStyle(color: AppColors.muted),
                     ),
                   ],

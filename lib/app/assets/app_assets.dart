@@ -4,7 +4,7 @@ class AppAssets {
   static const onboardingBackground = 'assets/images/onboarding_bg.png';
   static const onboardingArrow = 'assets/images/onboarding_arrow.png';
 
-  static const loginKakao = 'assets/images/login_kakao.png';
+  static const loginKakao = 'assets/images/login_kakao.svg';
   static const loginGoogle = 'assets/images/login_google.svg';
   static const loginClose = 'assets/images/login_close.png';
 

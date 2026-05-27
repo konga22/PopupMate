@@ -7,6 +7,9 @@ import '../../app/router/app_page.dart';
 import '../../app/router/app_tab.dart';
 import '../../app/theme/app_theme.dart';
 import '../../models/mock_models.dart';
+import 'navigation/app_bottom_nav_bar.dart';
+
+export 'navigation/app_bottom_nav_bar.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   const AppTopBar({
@@ -70,113 +73,11 @@ class MainShellPage extends StatelessWidget {
       appBar: AppTopBar(title: title, actions: actions),
       body: child,
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: UnifiedBottomNavBar(activeTab: activeTab),
+      bottomNavigationBar: AppBottomNavBar(activeTab: activeTab),
     );
   }
 }
 
-class UnifiedBottomNavBar extends StatelessWidget {
-  const UnifiedBottomNavBar({super.key, required this.activeTab});
-
-  final AppTab activeTab;
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-
-    return Container(
-      height: 76 + bottomInset,
-      padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceAlt,
-        border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 10,
-            offset: Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: AppTab.values.map((tab) {
-          final isActive = tab == activeTab;
-          final isHome = tab == AppTab.home;
-
-          return Expanded(
-            child: InkWell(
-              onTap: () {
-                if (isActive) return;
-                context.goNamed(tab.page.name);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (isHome)
-                    Transform.translate(
-                      offset: const Offset(0, -12),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: isActive ? AppColors.ink : AppColors.muted,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white, width: 4),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x26000000),
-                              blurRadius: 12,
-                              offset: Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Icon(tab.icon, color: Colors.white, size: 24),
-                      ),
-                    )
-                  else
-                    Icon(
-                      tab.icon,
-                      size: 22,
-                      color: isActive ? AppColors.ink : const Color(0xFF8A8D96),
-                    ),
-                  if (isHome)
-                    Transform.translate(
-                      offset: const Offset(0, -8),
-                      child: _NavLabel(label: tab.label, isActive: isActive),
-                    )
-                  else ...[
-                    4.heightBox,
-                    _NavLabel(label: tab.label, isActive: isActive),
-                  ],
-                ],
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-class _NavLabel extends StatelessWidget {
-  const _NavLabel({required this.label, required this.isActive});
-  final String label;
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        color: isActive ? AppColors.ink : const Color(0xFF8A8D96),
-        fontSize: 11,
-        fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
-        letterSpacing: -0.2,
-      ),
-    );
-  }
-}
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({

@@ -12,7 +12,28 @@
           "package_name": "com.konga22.popupmate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "332112843208-73tbrisvf9m4n59sphua9k4rumgh6053.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.konga22.popupmate",
+            "certificate_hash": "b6709b07c433d8e5da7290f90586bc40113af064"
+          }
+        },
+        {
+          "client_id": "332112843208-kg9mmkelnvp50j2005uch06e0rhelcdt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.konga22.popupmate",
+            "certificate_hash": "8c15e3be1f9b82ecb2b00356e6e3c1136e769321"
+          }
+        },
+        {
+          "client_id": "332112843208-6up4pflav8adf8251srmr6d0894fq6l6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCy9MTBTOkJEv-5r1x0qAquUDdoFXZtXDk"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "332112843208-6up4pflav8adf8251srmr6d0894fq6l6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "332112843208-cspl1kp8hjm782nsdg98v6cqvv7agmg5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.konga22.popupmate"
+              }
+            }
+          ]
         }
       }
     }
