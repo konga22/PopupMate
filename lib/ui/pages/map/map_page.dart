@@ -8,8 +8,8 @@ import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../services/location_service.dart';
+import '../../common/navigation/app_bottom_nav_bar.dart';
 import 'widgets/map_search_bar.dart';
-import 'widgets/map_bottom_nav_bar.dart';
 import 'widgets/map_floating_controls.dart';
 import 'widgets/map_quick_preview_card.dart';
 import 'widgets/map_naver_view.dart';
@@ -121,7 +121,7 @@ class _MapPageState extends State<MapPage> {
           ],
         ),
       ),
-      bottomNavigationBar: const MapBottomNavBar(activeTab: AppTab.map),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.map),
     );
   }
 }

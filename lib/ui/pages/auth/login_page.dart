@@ -7,7 +7,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
-import '../../../services/google_auth_service.dart';
+import '../../../services/auth/google_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

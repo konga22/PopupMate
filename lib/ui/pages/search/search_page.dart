@@ -85,7 +85,7 @@ class SearchPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const FigmaBottomNavBar(activeTab: AppTab.search),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.search),
     );
   }
 }

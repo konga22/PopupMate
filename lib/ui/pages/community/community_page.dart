@@ -6,10 +6,11 @@ import '../../../app/extensions/spacing_extension.dart';
 import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
 import '../../../app/theme/app_theme.dart';
-import '../../../models/mock_models.dart';
-import '../../../services/community_service.dart';
-import '../../../services/mock_community_service.dart';
+import '../../../models/community_models.dart';
+import '../../../services/community/community_service.dart';
+import '../../../services/community/mock_community_service.dart';
 import '../../common/app_components.dart';
+import 'widgets/community_post_card.dart';
 
 class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
@@ -104,7 +105,7 @@ class _CommunityPageState extends State<CommunityPage> {
               ...posts.map(
                 (post) => Padding(
                   padding: const EdgeInsets.only(bottom: 14),
-                  child: _PostCard(post: post),
+                  child: CommunityPostCard(post: post),
                 ),
               ),
             ],
@@ -121,91 +122,5 @@ class _CommunityPageState extends State<CommunityPage> {
     final mockPosts = MockCommunityService.posts;
     if (_category == '전체') return mockPosts;
     return mockPosts.where((post) => post.category == _category).toList();
-  }
-}
-
-class _PostCard extends StatelessWidget {
-  const _PostCard({required this.post});
-
-  final CommunityPost post;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: () {
-        context.pushNamed(
-          AppPage.communityDetail.name,
-          pathParameters: {'postId': post.id},
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.softBorder),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.surfaceAlt,
-                  child: Text(post.author.isEmpty ? '?' : post.author[0]),
-                ),
-                10.widthBox,
-                Expanded(
-                  child: Text(
-                    '${post.author} · ${post.timeAgo}',
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                ),
-                StatusBadge(label: post.status),
-              ],
-            ),
-            14.heightBox,
-            Text(
-              post.title,
-              style: const TextStyle(
-                color: AppColors.ink,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            6.heightBox,
-            Text(
-              post.popupTitle,
-              style: const TextStyle(color: AppColors.muted),
-            ),
-            10.heightBox,
-            Text(
-              post.body,
-              style: const TextStyle(color: AppColors.body, height: 1.45),
-            ),
-            14.heightBox,
-            Row(
-              children: [
-                const Icon(LucideIcons.heart, size: 16, color: AppColors.muted),
-                5.widthBox,
-                Text('${post.likes}'),
-                14.widthBox,
-                const Icon(
-                  LucideIcons.messageCircle,
-                  size: 16,
-                  color: AppColors.muted,
-                ),
-                5.widthBox,
-                Text('${post.comments}'),
-                const Spacer(),
-                const Text('자세히 보기'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

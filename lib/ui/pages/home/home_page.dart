@@ -4,6 +4,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
+import '../../../app/router/app_tab.dart';
+import '../../common/navigation/app_bottom_nav_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,7 +14,6 @@ class HomePage extends StatelessWidget {
   static const _ink = Color(0xFF1C1B1C);
   static const _title = Color(0xFF393C43);
   static const _body = Color(0xFF45474B);
-  static const _navText = Color(0xFF616365);
   static const _surfaceAlt = Color(0xFFF0EDED);
   static const _border = Color(0xFFC6C6CB);
   static const _danger = Color(0xFFBA1A1A);
@@ -23,8 +24,6 @@ class HomePage extends StatelessWidget {
       420,
       480,
     );
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final navHeight = 102.0 + bottomInset;
 
     return Scaffold(
       backgroundColor: _background,
@@ -37,7 +36,7 @@ class HomePage extends StatelessWidget {
                 const _HomeHeader(),
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.only(bottom: navHeight + 40),
+                    padding: const EdgeInsets.only(bottom: 112),
                     children: [
                       _HeroSection(height: heroHeight.toDouble()),
                       const SizedBox(height: 32),
@@ -52,23 +51,15 @@ class HomePage extends StatelessWidget {
             ),
             Positioned(
               right: 20,
-              bottom: navHeight + 8,
+              bottom: 16,
               child: _FloatingReportButton(
                 onTap: () => context.pushNamed(AppPage.communityWrite.name),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _FigmaBottomNav(
-                height: navHeight,
-                bottomInset: bottomInset,
               ),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.home),
     );
   }
 }
@@ -713,117 +704,6 @@ class _FloatingReportButton extends StatelessWidget {
         ),
         child: const Center(
           child: Icon(LucideIcons.plus, color: Colors.white, size: 30),
-        ),
-      ),
-    );
-  }
-}
-
-class _FigmaBottomNav extends StatelessWidget {
-  const _FigmaBottomNav({required this.height, required this.bottomInset});
-
-  final double height;
-  final double bottomInset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: const BoxDecoration(
-        color: HomePage._surfaceAlt,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-        border: Border(top: BorderSide(color: HomePage._border)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(top: 20.5, bottom: bottomInset),
-        child: Row(
-          children: [
-            _NavItem(
-              icon: LucideIcons.search,
-              label: '검색',
-              onTap: () => context.goNamed(AppPage.search.name),
-            ),
-            _NavItem(
-              icon: LucideIcons.map,
-              label: '지도',
-              onTap: () => context.goNamed(AppPage.map.name),
-            ),
-            _NavItem(
-              icon: LucideIcons.house,
-              label: '홈',
-              active: true,
-              onTap: () => context.goNamed(AppPage.home.name),
-            ),
-            _NavItem(
-              icon: LucideIcons.messageCircle,
-              label: '커뮤니티',
-              onTap: () => context.goNamed(AppPage.community.name),
-            ),
-            _NavItem(
-              icon: LucideIcons.user,
-              label: '프로필',
-              onTap: () => context.goNamed(AppPage.profile.name),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.active = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 44,
-              height: 34,
-              child: Center(
-                child:
-                    active
-                        ? Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: HomePage._title,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(icon, color: Colors.white, size: 20),
-                        )
-                        : Icon(icon, color: HomePage._navText, size: 30),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: active ? HomePage._title : HomePage._navText,
-                fontSize: 10,
-                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                height: 15 / 10,
-              ),
-            ),
-          ],
         ),
       ),
     );
