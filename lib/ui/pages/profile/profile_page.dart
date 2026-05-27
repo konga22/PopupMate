@@ -5,7 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../app/extensions/spacing_extension.dart';
 import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
-import '../../../services/mock_profile_service.dart';
+import '../../../services/profile/mock_profile_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/profile_account_section.dart';
 import 'widgets/profile_badge_section.dart';

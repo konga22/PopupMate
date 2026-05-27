@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/extensions/spacing_extension.dart';
-import '../../../services/mock_profile_service.dart';
+import '../../../services/profile/mock_profile_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/profile_detail_header.dart';
 import 'widgets/profile_stats_row.dart';
