@@ -5,19 +5,36 @@ import '../../../../app/theme/app_theme.dart';
 
 class MapSearchBar extends StatefulWidget {
   final ValueChanged<String>? onSearch;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onFilterTap;
+  final TextEditingController? controller;
 
-  const MapSearchBar({super.key, this.onSearch});
+  const MapSearchBar({
+    super.key,
+    this.onSearch,
+    this.onChanged,
+    this.onFilterTap,
+    this.controller,
+  });
 
   @override
   State<MapSearchBar> createState() => _MapSearchBarState();
 }
 
 class _MapSearchBarState extends State<MapSearchBar> {
-  final _controller = TextEditingController();
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ?? TextEditingController();
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -47,6 +64,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
               controller: _controller,
               textInputAction: TextInputAction.search,
               onSubmitted: widget.onSearch,
+              onChanged: widget.onChanged,
               decoration: const InputDecoration(
                 hintText: '성수동 팝업스토어 검색',
                 hintStyle: TextStyle(
@@ -68,10 +86,13 @@ class _MapSearchBarState extends State<MapSearchBar> {
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(
-            LucideIcons.slidersHorizontal,
-            size: 20,
-            color: AppColors.ink,
+          GestureDetector(
+            onTap: widget.onFilterTap,
+            child: const Icon(
+              LucideIcons.slidersHorizontal,
+              size: 20,
+              color: AppColors.ink,
+            ),
           ),
         ],
       ),

@@ -5,12 +5,16 @@ import '../../../../app/assets/app_assets.dart';
 import '../../../../app/theme/app_theme.dart';
 
 class MapQuickPreviewCard extends StatelessWidget {
+  final Map<String, dynamic> popup;
+  final String distanceLabel;
   final bool saved;
   final VoidCallback onWaitingTap;
   final VoidCallback onSaveTap;
 
   const MapQuickPreviewCard({
     super.key,
+    required this.popup,
+    required this.distanceLabel,
     required this.saved,
     required this.onWaitingTap,
     required this.onSaveTap,
@@ -43,21 +47,26 @@ class MapQuickPreviewCard extends StatelessWidget {
                   child: SizedBox(
                     width: 80,
                     height: 80,
-                    child: OverflowBox(
-                      maxWidth: 243,
-                      maxHeight: 80,
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        AppAssets.mapPreview,
-                        width: 243,
+                      child: Image.network(
+                        popup['imageUrl'] as String,
+                        headers: const {'User-Agent': 'Mozilla/5.0'},
+                        width: 80,
                         height: 80,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 80,
+                            height: 80,
+                            color: Colors.grey[200],
+                            alignment: Alignment.center,
+                            child: const Icon(Icons.broken_image, color: Colors.grey),
+                          );
+                        },
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(width: 16),
-                const Expanded(child: _PreviewContent()),
+                Expanded(child: _PreviewContent(popup: popup, distanceLabel: distanceLabel)),
               ],
             ),
           ),
@@ -120,11 +129,14 @@ class MapQuickPreviewCard extends StatelessWidget {
 }
 
 class _PreviewContent extends StatelessWidget {
-  const _PreviewContent();
+  final Map<String, dynamic> popup;
+  final String distanceLabel;
+
+  const _PreviewContent({required this.popup, required this.distanceLabel});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -134,7 +146,7 @@ class _PreviewContent extends StatelessWidget {
             _NewBadge(),
             Flexible(
               child: Text(
-                '200m away',
+                distanceLabel,
                 textAlign: TextAlign.right,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -149,9 +161,9 @@ class _PreviewContent extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
-          'Aromatic Cloud Popup',
+          popup['title'] as String,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -162,7 +174,7 @@ class _PreviewContent extends StatelessWidget {
           ),
         ),
         Text(
-          '성수동 2가 314-1',
+          popup['address'] as String,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(

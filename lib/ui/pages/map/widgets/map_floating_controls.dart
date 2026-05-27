@@ -66,7 +66,7 @@ class _RadiusDropdown extends StatelessWidget {
       itemBuilder: (context) {
         return options.map((option) {
           final isSelected = option == selectedRadius;
-          final optionLabel = option == 1000 ? '1km' : '${option}m';
+          final optionLabel = '${option}m';
 
           return PopupMenuItem<int>(
             value: option,

@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../../../app/theme/app_theme.dart';
+import '../../../../models/map_mock_data.dart';
 
 class MapNaverView extends StatefulWidget {
   final NLatLng center;
   final double radius;
+  final String? selectedCategory;
+  final bool? isReservationAvailable;
+  final String? searchQuery;
   final ValueChanged<NaverMapController>? onMapReady;
+  final ValueChanged<Map<String, dynamic>>? onMarkerTap;
 
   const MapNaverView({
     super.key,
     required this.center,
     required this.radius,
+    this.selectedCategory,
+    this.isReservationAvailable,
+    this.searchQuery,
     this.onMapReady,
+    this.onMarkerTap,
   });
 
   @override
@@ -21,12 +31,17 @@ class MapNaverView extends StatefulWidget {
 
 class _MapNaverViewState extends State<MapNaverView> {
   NaverMapController? _mapController;
+  final Map<String, NOverlayImage> _markerCache = {};
 
   @override
   void didUpdateWidget(covariant MapNaverView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (_mapController != null) {
-      if (oldWidget.center != widget.center || oldWidget.radius != widget.radius) {
+      if (oldWidget.center != widget.center || 
+          oldWidget.radius != widget.radius ||
+          oldWidget.selectedCategory != widget.selectedCategory ||
+          oldWidget.isReservationAvailable != widget.isReservationAvailable ||
+          oldWidget.searchQuery != widget.searchQuery) {
         _updateOverlays();
         _moveCameraToCenter();
       }
@@ -57,12 +72,76 @@ class _MapNaverViewState extends State<MapNaverView> {
     return 14.0;
   }
 
-  void _updateOverlays() {
+  Future<void> _updateOverlays() async {
     if (_mapController == null) return;
 
+    // 1. Filter popups
+    final filteredPopups = MapMockData.popups.where((popup) {
+      if (widget.selectedCategory != null && popup['cat'] != widget.selectedCategory) return false;
+      if (widget.isReservationAvailable != null && popup['res'] != widget.isReservationAvailable) return false;
+      if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
+        final title = (popup['title'] as String).toLowerCase();
+        final query = widget.searchQuery!.toLowerCase();
+        if (!title.contains(query)) return false;
+      }
+      
+      final pos = popup['pos'] as NLatLng;
+      final distance = Geolocator.distanceBetween(
+        widget.center.latitude,
+        widget.center.longitude,
+        pos.latitude,
+        pos.longitude,
+      );
+      if (distance > widget.radius) return false;
+      
+      return true;
+    }).toList();
+
+    // 2. Draw what we currently have
+    _drawOverlays(filteredPopups);
+
+    // 3. Generate missing custom icons asynchronously
+    bool needsRedraw = false;
+    for (var popup in filteredPopups) {
+      final id = popup['id'] as String;
+      if (!_markerCache.containsKey(id)) {
+        try {
+          if (!mounted) return;
+          
+          _markerCache[id] = await NOverlayImage.fromWidget(
+            widget: Container(
+              width: 28,
+              height: 28,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF25042),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.storefront,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+            size: const Size(28, 28),
+            context: context,
+          );
+          needsRedraw = true;
+        } catch (e) {
+          debugPrint('Error generating custom marker: $e');
+        }
+      }
+    }
+
+    // 4. Redraw if new icons were generated
+    if (needsRedraw && mounted) {
+      _drawOverlays(filteredPopups);
+    }
+  }
+
+  void _drawOverlays(List<Map<String, dynamic>> popups) {
+    if (_mapController == null) return;
     _mapController!.clearOverlays();
 
-    // 1. Add Circle Overlay for search radius
     final circle = NCircleOverlay(
       id: 'search_radius_circle',
       center: widget.center,
@@ -73,33 +152,22 @@ class _MapNaverViewState extends State<MapNaverView> {
     );
     _mapController!.addOverlay(circle);
 
-    // 2. Add Seongsu area mock markers (Pins & Clusters)
-    // Pin Marker (representing a specific popup, e.g., Aromatic Cloud Popup)
-    final pinMarker = NMarker(
-      id: 'pin_marker_aromatic',
-      position: const NLatLng(37.5460, 127.0535),
-      caption: const NOverlayCaption(text: 'Aromatic Cloud Popup'),
-    );
-    _mapController!.addOverlay(pinMarker);
-
-    // Cluster Marker 1 (e.g. 12 popups at Seongsu station area)
-    if (widget.radius >= 500) {
-      final cluster1 = NMarker(
-        id: 'cluster_marker_1',
-        position: const NLatLng(37.5445, 127.0560),
-        caption: const NOverlayCaption(text: '12개 팝업'),
+    for (var popup in popups) {
+      final id = popup['id'] as String;
+      final marker = NMarker(
+        id: id,
+        position: popup['pos'] as NLatLng,
+        caption: NOverlayCaption(text: popup['title'] as String),
+        icon: _markerCache[id], // Use custom icon if available
       );
-      _mapController!.addOverlay(cluster1);
-    }
-
-    // Cluster Marker 2 (e.g. 5 popups further away)
-    if (widget.radius >= 1000) {
-      final cluster2 = NMarker(
-        id: 'cluster_marker_2',
-        position: const NLatLng(37.5420, 127.0600),
-        caption: const NOverlayCaption(text: '5개 팝업'),
-      );
-      _mapController!.addOverlay(cluster2);
+      
+      marker.setOnTapListener((overlay) {
+        if (widget.onMarkerTap != null) {
+          widget.onMarkerTap!(popup);
+        }
+      });
+      
+      _mapController!.addOverlay(marker);
     }
   }
 
