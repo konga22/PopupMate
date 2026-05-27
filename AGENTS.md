@@ -14,7 +14,14 @@ PopupMate는 한국의 팝업 스토어를 발견, 탐색, 저장, 공유하는 
 | Routing | go_router |
 | Icons | lucide_icons_flutter |
 | Platforms | iOS / Android |
-| Backend | Mock services only for now |
+| Backend | Firebase Auth / Firestore + mock fallback services |
+
+## Read Before Editing
+
+- `README.md`: setup and document index.
+- `docs/architecture.md`: folder responsibilities and where new files should go.
+- `docs/conventions.md`: naming, page/widget/service writing rules.
+- `docs/design-system.md`: visual tokens and UI direction.
 
 ## Structure
 
@@ -22,14 +29,19 @@ PopupMate는 한국의 팝업 스토어를 발견, 탐색, 저장, 공유하는 
 lib/
   main.dart
   app/
+    assets/
     router/
     theme/
     extensions/
   models/
   services/
+    <feature>/
   ui/
     common/
+      <role>/
     pages/
+      <feature>/
+        widgets/
 ```
 
 ## Required Style

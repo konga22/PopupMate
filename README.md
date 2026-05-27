@@ -34,21 +34,64 @@ Android Emulator:
 flutter run -d android
 ```
 
+## Documentation Guide
+
+처음 합류한 사람이나 다른 AI가 프로젝트 구조를 이해해야 할 때는 아래 순서로 읽습니다.
+
+| 문서 | 용도 |
+| --- | --- |
+| [`AGENTS.md`](AGENTS.md) | AI/coding agent가 작업 전에 지켜야 하는 필수 규칙 |
+| [`docs/architecture.md`](docs/architecture.md) | 파일 구조, 폴더 책임, 새 파일 위치 판단 기준 |
+| [`docs/conventions.md`](docs/conventions.md) | 네이밍, 화면 분리, service/UI 작성 규칙 |
+| [`docs/design-system.md`](docs/design-system.md) | 색상, 아이콘, 공통 UI 톤 |
+| [`docs/screens.md`](docs/screens.md) | 구현된 화면 목록 |
+| [`docs/global-features.md`](docs/global-features.md) | 앱 전역 기능과 위치 |
+
+README는 실행 방법과 문서 입구만 담고, 상세한 구조 설명은 `docs/architecture.md`에 둡니다.
+AI 작업 맥락은 README보다 `AGENTS.md`에 두는 편이 더 안정적입니다.
+
 ## Project Structure
 
 ```text
 lib/
   main.dart
   app/
+    assets/
     router/
     theme/
     extensions/
   models/
   services/
+    auth/
+    community/
+    popup/
+    profile/
+    waiting/
   ui/
     common/
+      badges/
+      buttons/
+      cards/
+      chips/
+      feedback/
+      fields/
+      layout/
+      navigation/
     pages/
+      auth/
+      calendar/
+      community/
+      home/
+      inventory/
+      map/
+      popup/
+      profile/
+      review/
+      search/
+      waiting/
 ```
+
+자세한 폴더별 책임과 새 파일 위치 기준은 [`docs/architecture.md`](docs/architecture.md)를 확인합니다.
 
 ## Current Scope
 
@@ -56,7 +99,7 @@ lib/
 - Loading, Onboarding, Permission, Login, Home 진입 흐름
 - 하단 탭: Search, Map, Home, Community, Profile
 - Popup detail, reviews, community, waiting, inventory, calendar, profile detail
-- Firebase/Auth/Firestore/Storage는 아직 연결하지 않음
+- Firebase Auth/Firestore 연동은 단계적으로 적용 중이며, 일부 화면은 mock fallback을 유지함
 
 ## Team Workflow
 
