@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/extensions/spacing_extension.dart';
 import '../../../../app/theme/app_theme.dart';
-import '../../../../models/mock_models.dart';
+import '../../../../models/waiting_models.dart';
 import '../../../common/app_components.dart';
 
 class WaitingStatusSummaryCard extends StatelessWidget {

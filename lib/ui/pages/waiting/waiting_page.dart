@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/extensions/context_extension.dart';
 import '../../../app/extensions/spacing_extension.dart';
 import '../../../app/router/app_page.dart';
-import '../../../services/waiting/mock_waiting_service.dart';
+import '../../../services/mock_waiting_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/waiting_registration_form.dart';
 import 'widgets/waiting_status_metrics.dart';

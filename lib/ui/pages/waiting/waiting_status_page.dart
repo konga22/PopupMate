@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/extensions/spacing_extension.dart';
-import '../../../services/waiting/mock_waiting_service.dart';
+import '../../../services/mock_waiting_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/waiting_nearby_section.dart';
 import 'widgets/waiting_status_summary_card.dart';

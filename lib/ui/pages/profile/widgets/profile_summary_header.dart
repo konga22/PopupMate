@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/extensions/spacing_extension.dart';
 import '../../../../app/theme/app_theme.dart';
-import '../../../../models/mock_models.dart';
+import '../../../../models/profile_models.dart';
 import 'profile_avatar.dart';
 
 class ProfileSummaryHeader extends StatelessWidget {

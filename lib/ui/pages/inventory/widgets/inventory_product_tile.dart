@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../app/theme/app_theme.dart';
-import '../../../../models/mock_models.dart';
+import '../../../../models/inventory_models.dart';
 import '../../../common/app_components.dart';
 
 class InventoryProductTile extends StatelessWidget {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../models/mock_models.dart';
+import '../../models/calendar_models.dart';
+import '../../models/inventory_models.dart';
+import '../../models/popup_models.dart';
 
 class MockPopupData {
   const MockPopupData._();
