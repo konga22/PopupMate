@@ -4,7 +4,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../app/router/app_page.dart';
 import '../../../../app/theme/app_theme.dart';
+import 'calendar_inline_icon_text.dart';
 import 'calendar_models.dart';
+import 'calendar_popup_status_pill.dart';
 
 class CalendarPopupCard extends StatelessWidget {
   const CalendarPopupCard({super.key, required this.item});
@@ -49,7 +51,10 @@ class CalendarPopupCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        _StatusPill(label: item.status, urgent: item.urgent),
+                        CalendarPopupStatusPill(
+                          label: item.status,
+                          urgent: item.urgent,
+                        ),
                         const Spacer(),
                         const Icon(
                           LucideIcons.heart,
@@ -71,12 +76,15 @@ class CalendarPopupCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    _InlineIconText(
+                    CalendarInlineIconText(
                       icon: LucideIcons.calendarDays,
                       label: item.period,
                     ),
                     const SizedBox(height: 2),
-                    _InlineIconText(icon: LucideIcons.mapPin, label: item.area),
+                    CalendarInlineIconText(
+                      icon: LucideIcons.mapPin,
+                      label: item.area,
+                    ),
                   ],
                 ),
               ),
@@ -84,63 +92,6 @@ class CalendarPopupCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.label, required this.urgent});
-
-  final String label;
-  final bool urgent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: urgent ? const Color(0xFFFFDAD6) : const Color(0xFFDFE0E2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: urgent ? const Color(0xFF93000A) : const Color(0xFF616365),
-          fontSize: 10,
-          height: 1.2,
-          fontWeight: urgent ? FontWeight.w400 : FontWeight.w500,
-        ),
-      ),
-    );
-  }
-}
-
-class _InlineIconText extends StatelessWidget {
-  const _InlineIconText({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: const Color(0xFF45474B), size: 13),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF45474B),
-              fontSize: 13,
-              height: 1.25,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
