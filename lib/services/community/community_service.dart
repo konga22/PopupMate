@@ -1,34 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/community_models.dart';
+import 'community_auth_session.dart';
+import 'community_firestore_refs.dart';
+import 'community_post_query.dart';
+import 'community_seed_posts.dart';
 
 class CommunityService {
   const CommunityService._();
-
-  static final _db = FirebaseFirestore.instance;
-  static const _collection = 'community_posts';
 
   static Stream<List<CommunityPost>> getPosts({
     String category = '전체',
     String sortBy = '최신순',
     String area = '전체',
   }) {
-    Query<Map<String, dynamic>> query = _db.collection(_collection);
-
-    if (category != '전체') {
-      query = query.where('category', isEqualTo: category);
-    }
-
-    if (area != '전체') {
-      query = query.where('area', isEqualTo: area);
-    }
-
-    query = switch (sortBy) {
-      '인기순' => query.orderBy('likes', descending: true),
-      '댓글순' => query.orderBy('comments', descending: true),
-      _ => query.orderBy('createdAt', descending: true),
-    };
+    final query = CommunityPostQuery.build(
+      collection: CommunityFirestoreRefs.posts,
+      category: category,
+      sortBy: sortBy,
+      area: area,
+    );
 
     return query.snapshots().map(
       (snapshot) =>
@@ -39,7 +30,7 @@ class CommunityService {
   }
 
   static Stream<CommunityPost?> getPost(String postId) {
-    return _db.collection(_collection).doc(postId).snapshots().map((snapshot) {
+    return CommunityFirestoreRefs.post(postId).snapshots().map((snapshot) {
       final data = snapshot.data();
       if (!snapshot.exists || data == null) return null;
       return CommunityPost.fromFirestore(snapshot.id, data);
@@ -53,12 +44,12 @@ class CommunityService {
     required String area,
     required String popupTitle,
   }) async {
-    final user = await _currentUser();
+    final user = await CommunityAuthSession.currentUser();
     if (user == null) throw Exception('로그인이 필요합니다.');
 
     final post = CommunityPost(
       id: '',
-      author: _displayNameFor(user.uid),
+      author: CommunityAuthSession.displayNameFor(user.uid),
       authorId: user.uid,
       timeAgo: '방금 전',
       category: category,
@@ -72,18 +63,18 @@ class CommunityService {
       createdAt: DateTime.now(),
     );
 
-    await _db.collection(_collection).add(post.toFirestore());
+    await CommunityFirestoreRefs.posts.add(post.toFirestore());
   }
 
   static Future<void> toggleLike(String postId) async {
     if (postId.startsWith('mock_')) return;
 
-    final user = await _currentUser();
+    final user = await CommunityAuthSession.currentUser();
     if (user == null) return;
 
-    final docRef = _db.collection(_collection).doc(postId);
+    final docRef = CommunityFirestoreRefs.post(postId);
 
-    await _db.runTransaction((transaction) async {
+    await CommunityFirestoreRefs.db.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
       if (!snapshot.exists) return;
 
@@ -104,8 +95,7 @@ class CommunityService {
   }
 
   static bool isLikedByCurrentUser(CommunityPost post) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    return uid != null && post.likedBy.contains(uid);
+    return CommunityAuthSession.isLikedByCurrentUser(post);
   }
 
   static Stream<List<CommunityComment>> getComments(String postId) {
@@ -113,10 +103,7 @@ class CommunityService {
       return Stream<List<CommunityComment>>.value(const []);
     }
 
-    return _db
-        .collection(_collection)
-        .doc(postId)
-        .collection('comments')
+    return CommunityFirestoreRefs.comments(postId)
         .orderBy('createdAt')
         .snapshots()
         .map(
@@ -132,80 +119,32 @@ class CommunityService {
   static Future<void> addComment(String postId, String body) async {
     if (postId.startsWith('mock_')) return;
 
-    final user = await _currentUser();
+    final user = await CommunityAuthSession.currentUser();
     if (user == null) return;
 
     final comment = CommunityComment(
       id: '',
-      author: _displayNameFor(user.uid),
+      author: CommunityAuthSession.displayNameFor(user.uid),
       authorId: user.uid,
       body: body,
       createdAt: DateTime.now(),
     );
 
-    final postRef = _db.collection(_collection).doc(postId);
-    final commentRef = postRef.collection('comments').doc();
+    final postRef = CommunityFirestoreRefs.post(postId);
+    final commentRef = CommunityFirestoreRefs.comments(postId).doc();
 
-    await _db.runTransaction((transaction) async {
+    await CommunityFirestoreRefs.db.runTransaction((transaction) async {
       transaction.set(commentRef, comment.toFirestore());
       transaction.update(postRef, {'comments': FieldValue.increment(1)});
     });
   }
 
   static Future<void> seedData() async {
-    final snapshot = await _db.collection(_collection).limit(1).get();
+    final snapshot = await CommunityFirestoreRefs.posts.limit(1).get();
     if (snapshot.docs.isNotEmpty) return;
 
-    for (final post in _seedPosts) {
-      await _db.collection(_collection).add(post);
+    for (final post in communitySeedPosts) {
+      await CommunityFirestoreRefs.posts.add(post);
     }
   }
-
-  static String _displayNameFor(String uid) {
-    final suffix = uid.length <= 4 ? uid : uid.substring(0, 4);
-    return '사용자_$suffix';
-  }
-
-  static Future<User?> _currentUser() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) return currentUser;
-
-    try {
-      final credential = await FirebaseAuth.instance.signInAnonymously();
-      return credential.user;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  static final _seedPosts = [
-    {
-      'author': '김민지',
-      'authorId': 'mock_1',
-      'category': '메이트',
-      'title': '탬버린즈 성수 워크숍 같이 가실 분!',
-      'popupTitle': 'Tamburins Seongsu',
-      'body': '이번 주말 성수동 팝업 같이 돌면서 사진 찍고 이야기하실 분 찾아요.',
-      'likes': 12,
-      'comments': 2,
-      'status': '2/4 모집중',
-      'area': '성수',
-      'likedBy': <String>[],
-      'createdAt': DateTime.now().subtract(const Duration(hours: 1)),
-    },
-    {
-      'author': '박알렉스',
-      'authorId': 'mock_2',
-      'category': '후기',
-      'title': 'Dior Concept Store는 오전 방문 추천',
-      'popupTitle': 'Dior Concept Store',
-      'body': '전시가 정말 아름다웠어요. 오전 일찍 방문하시는 것을 강력 추천합니다.',
-      'likes': 45,
-      'comments': 5,
-      'status': 'HOT',
-      'area': '성수',
-      'likedBy': <String>[],
-      'createdAt': DateTime.now().subtract(const Duration(hours: 5)),
-    },
-  ];
 }
