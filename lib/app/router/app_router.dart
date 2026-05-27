@@ -6,6 +6,7 @@ import '../../ui/pages/auth/login_page.dart';
 import '../../ui/pages/auth/onboarding_page.dart';
 import '../../ui/pages/auth/permission_page.dart';
 import '../../ui/pages/calendar/calendar_page.dart';
+import '../../ui/pages/community/community_detail_page.dart';
 import '../../ui/pages/community/community_page.dart';
 import '../../ui/pages/community/community_write_page.dart';
 import '../../ui/pages/home/home_page.dart';
@@ -105,6 +106,14 @@ final appRouter = GoRouter(
       name: AppPage.communityWrite.name,
       path: AppPage.communityWrite.path,
       builder: (_, __) => const CommunityWritePage(),
+    ),
+    GoRoute(
+      name: AppPage.communityDetail.name,
+      path: AppPage.communityDetail.path,
+      builder: (_, state) {
+        final postId = state.pathParameters['postId'] ?? '';
+        return CommunityDetailPage(postId: postId);
+      },
     ),
     GoRoute(
       name: AppPage.profileDetail.name,

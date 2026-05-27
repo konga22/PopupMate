@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "Bash(flutter devices *)",
+      "Bash(flutter pub *)",
+      "Bash(flutter run *)",
+      "Bash(start cmd *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(timeout 60 bash -c 'while true; do content=$\\(cat \"C:/Users/user/AppData/Local/Temp/claude/C--Users-user-Desktop-PopupMate-master-PopupMate-master/8ff6532b-c04d-4366-a985-a91827101781/tasks/bi7bvz231.output\"\\); if echo \"$content\" | grep -q \"Running\\\\|Error\\\\|flutter: \"; then echo \"$content\"; break; fi; sleep 5; done')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); clients=d.get\\('client',[]\\); [print\\('oauth_clients:', [c.get\\('client_id'\\) for c in cl.get\\('oauth_client',[]\\)]\\) for cl in clients]\")",
+      "Bash(flutter analyze *)",
+      "Bash(flutter emulators *)",
+      "Bash(flutter clean *)",
+      "Bash(adb -s emulator-5556 shell screencap -p /sdcard/screen.png)",
+      "Bash(adb -s emulator-5556 pull /sdcard/screen.png \"C:/Users/user/AppData/Local/Temp/popupmate_screen.png\")",
+      "PowerShell($adb = \"$env:LOCALAPPDATA\\\\Android\\\\sdk\\\\platform-tools\\\\adb.exe\"; & $adb -s emulator-5556 shell screencap -p /sdcard/screen.png; & $adb -s emulator-5556 pull /sdcard/screen.png \"$env:TEMP\\\\popupmate_screen.png\")",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git branch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git merge *)",
+      "PowerShell($env:PATH += \";$env:LOCALAPPDATA\\\\Programs\\\\GitHub CLI\"; gh api repos/konga22/PopupMate/compare/dev...team/skngyj --jq '{status: .status, ahead_by: .ahead_by, behind_by: .behind_by}' 2>&1)",
+      "PowerShell(Start-Process \"https://github.com/konga22/PopupMate/compare/dev...team/skngyj?expand=1&title=feat%3A+Google+%EB%A1%9C%EA%B7%B8%EC%9D%B8+%EA%B5%AC%ED%98%84+%28Apple+%EB%B2%84%ED%8A%BC+%EB%8C%80%EC%B2%B4%29&body=-%20google_sign_in+%ED%8C%A8%ED%82%A4%EC%A7%80+%EC%B6%94%EA%B0%80%0A-%20GoogleAuthService+%EA%B5%AC%ED%98%84+%28Firebase+Auth+%EC%97%B0%EB%8F%99%29%0A-%20%EB%A1%9C%EA%B7%B8%EC%9D%B8+%ED%99%94%EB%A9%B4+Apple+%EB%B2%84%ED%8A%BC+%E2%86%92+Google+%EB%B2%84%ED%8A%BC+%EA%B5%90%EC%B2%B4%0A-%20Google+%EB%A1%9C%EA%B3%A0+SVG+%EC%97%90%EC%85%8B+%EC%B6%94%EA%B0%80\")",
+      "Bash(git show *)",
+      "Bash(git ls-tree *)"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../services/google_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,11 +19,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   static const _kakaoBackground = Color(0xFFFEE500);
   static const _kakaoText = Color(0xFF191919);
-  static const _appleBackground = Color(0xFF1C1B1C);
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -37,6 +38,25 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
     setState(() => _loading = false);
     context.goNamed(AppPage.home.name);
+  }
+
+  Future<void> _onGoogleLogin() async {
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+    try {
+      final result = await GoogleAuthService.signIn();
+      if (!mounted) return;
+      if (result != null) {
+        context.goNamed(AppPage.home.name);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'Google 로그인에 실패했습니다.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -160,19 +180,31 @@ class _LoginPageState extends State<LoginPage> {
                                   textColor: _kakaoText,
                                   icon: AppAssets.loginKakao,
                                   iconSize: 20,
-                                  onPressed: _onLogin,
+                                  onPressed: _loading ? null : _onLogin,
                                 ),
                                 const SizedBox(height: 16),
                                 _SocialButton(
-                                  label: 'Apple로 로그인',
-                                  backgroundColor: _appleBackground,
-                                  textColor: Colors.white,
-                                  icon: AppAssets.loginApple,
-                                  iconSize: 18,
-                                  iconColor: Colors.white,
-                                  onPressed: _onLogin,
-                                  fontWeight: FontWeight.w700,
+                                  label: 'Google로 로그인',
+                                  backgroundColor: Colors.white,
+                                  textColor: const Color(0xFF3C4043),
+                                  icon: AppAssets.loginGoogle,
+                                  iconSize: 20,
+                                  onPressed: _loading ? null : _onGoogleLogin,
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFDADCE0),
+                                  ),
                                 ),
+                                if (_errorMessage != null) ...[
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(
+                                      color: Color(0xFFB3261E),
+                                      fontSize: 13,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                                 SizedBox(height: sectionGap),
                                 const _DividerWithText(),
                                 SizedBox(height: sectionGap),
@@ -249,8 +281,7 @@ class _SocialButton extends StatelessWidget {
     required this.icon,
     required this.iconSize,
     required this.onPressed,
-    this.iconColor,
-    this.fontWeight = FontWeight.w500,
+    this.borderSide,
   });
 
   final String label;
@@ -258,9 +289,8 @@ class _SocialButton extends StatelessWidget {
   final Color textColor;
   final String icon;
   final double iconSize;
-  final Color? iconColor;
-  final VoidCallback onPressed;
-  final FontWeight fontWeight;
+  final VoidCallback? onPressed;
+  final BorderSide? borderSide;
 
   @override
   Widget build(BuildContext context) {
@@ -272,15 +302,16 @@ class _SocialButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          elevation: 1,
+          elevation: borderSide != null ? 0 : 1,
           shadowColor: Colors.black.withValues(alpha: 0.05),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
+            side: borderSide ?? BorderSide.none,
           ),
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 16,
-            fontWeight: fontWeight,
+            fontWeight: FontWeight.w500,
             height: 24 / 16,
           ),
         ),
@@ -291,15 +322,9 @@ class _SocialButton extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: SvgPicture.asset(
-                  icon,
-                  width: iconSize,
-                  height: iconSize,
-                  colorFilter:
-                      iconColor == null
-                          ? null
-                          : ColorFilter.mode(iconColor!, BlendMode.srcIn),
-                ),
+                child: icon.endsWith('.svg')
+                    ? SvgPicture.asset(icon, width: iconSize, height: iconSize)
+                    : Image.asset(icon, width: iconSize, height: iconSize),
               ),
               Text(label),
             ],
