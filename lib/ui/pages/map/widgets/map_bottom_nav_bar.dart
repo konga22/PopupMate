@@ -28,20 +28,21 @@ class MapBottomNavBar extends StatelessWidget {
         ],
       ),
       child: Row(
-        children: AppTab.values.map((tab) {
-          return Expanded(
-            child: _MapBottomNavItem(
-              tab: tab,
-              active: tab == activeTab,
-              onTap: () {
-                if (tab == activeTab) {
-                  return;
-                }
-                context.goNamed(tab.page.name);
-              },
-            ),
-          );
-        }).toList(),
+        children:
+            AppTab.values.map((tab) {
+              return Expanded(
+                child: _MapBottomNavItem(
+                  tab: tab,
+                  active: tab == activeTab,
+                  onTap: () {
+                    if (tab == activeTab) {
+                      return;
+                    }
+                    context.goNamed(tab.page.name);
+                  },
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -68,21 +69,23 @@ class _MapBottomNavItem extends StatelessWidget {
           duration: const Duration(milliseconds: 140),
           curve: Curves.easeOut,
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          padding: active
-              ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-              : const EdgeInsets.all(8),
+          padding:
+              active
+                  ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+                  : const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: active ? AppColors.ink : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
-            boxShadow: active
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0D000000),
-                      blurRadius: 1,
-                      offset: Offset(0, 1),
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                active
+                    ? const [
+                      BoxShadow(
+                        color: Color(0x0D000000),
+                        blurRadius: 1,
+                        offset: Offset(0, 1),
+                      ),
+                    ]
+                    : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
