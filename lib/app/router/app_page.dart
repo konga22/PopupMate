@@ -15,6 +15,7 @@ enum AppPage {
   inventory,
   reviewWrite,
   communityWrite,
+  communityDetail,
   profileDetail,
 }
 
@@ -36,6 +37,7 @@ extension AppPageExtension on AppPage {
     AppPage.inventory => '/inventory',
     AppPage.reviewWrite => '/reviews/write',
     AppPage.communityWrite => '/community/write',
+    AppPage.communityDetail => '/community/:postId',
     AppPage.profileDetail => '/profile/:id',
   };
 }
