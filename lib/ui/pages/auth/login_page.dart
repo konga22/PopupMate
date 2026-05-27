@@ -7,6 +7,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
+import '../../../services/google_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -40,6 +42,29 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
     setState(() => _loading = false);
     context.goNamed(AppPage.home.name);
+  }
+
+  Future<void> _onGoogleLogin() async {
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final result = await GoogleAuthService.signIn();
+      if (!mounted) return;
+
+      if (result != null) {
+        context.goNamed(AppPage.home.name);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'Google 로그인에 실패했습니다.');
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   @override
@@ -140,19 +165,33 @@ class _LoginPageState extends State<LoginPage> {
                           textColor: const Color(0xFF191919),
                           assetIcon: AppAssets.loginKakao,
                           iconSize: 20,
-                          onPressed: _onLogin,
+                          onPressed: _loading ? null : _onLogin,
                         ),
                         const SizedBox(height: 12),
                         _SocialButton(
-                          label: 'Apple로 로그인',
-                          backgroundColor: _ink,
-                          textColor: Colors.white,
-                          lucideIcon: LucideIcons.apple,
-                          iconSize: 18,
-                          iconColor: Colors.white,
-                          onPressed: _onLogin,
-                          fontWeight: FontWeight.w700,
+                          label: 'Google로 로그인',
+                          backgroundColor: Colors.white,
+                          textColor: const Color(0xFF3C4043),
+                          assetIcon: AppAssets.loginGoogle,
+                          iconSize: 20,
+                          onPressed: _loading ? null : _onGoogleLogin,
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDADCE0),
+                          ),
                         ),
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 10),
+                          Center(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                color: Color(0xFFB3261E),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 22),
                         const _DividerWithText(),
                         const SizedBox(height: 22),
@@ -225,20 +264,16 @@ class _SocialButton extends StatelessWidget {
     required this.iconSize,
     required this.onPressed,
     this.assetIcon,
-    this.lucideIcon,
-    this.iconColor,
-    this.fontWeight = FontWeight.w500,
+    this.borderSide,
   });
 
   final String label;
   final Color backgroundColor;
   final Color textColor;
   final String? assetIcon;
-  final IconData? lucideIcon;
   final double iconSize;
-  final Color? iconColor;
-  final VoidCallback onPressed;
-  final FontWeight fontWeight;
+  final VoidCallback? onPressed;
+  final BorderSide? borderSide;
 
   @override
   Widget build(BuildContext context) {
@@ -250,15 +285,16 @@ class _SocialButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          elevation: 1,
+          elevation: borderSide == null ? 1 : 0,
           shadowColor: Colors.black.withValues(alpha: 0.05),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
+            side: borderSide ?? BorderSide.none,
           ),
           textStyle: TextStyle(
             fontSize: 16,
-            fontWeight: fontWeight,
+            fontWeight: FontWeight.w500,
             height: 24 / 16,
           ),
         ),
@@ -269,12 +305,7 @@ class _SocialButton extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: _SocialButtonIcon(
-                  assetIcon: assetIcon,
-                  iconData: lucideIcon,
-                  size: iconSize,
-                  color: iconColor,
-                ),
+                child: _SocialButtonIcon(assetIcon: assetIcon, size: iconSize),
               ),
               Text(label),
             ],
@@ -286,31 +317,14 @@ class _SocialButton extends StatelessWidget {
 }
 
 class _SocialButtonIcon extends StatelessWidget {
-  const _SocialButtonIcon({
-    required this.assetIcon,
-    required this.iconData,
-    required this.size,
-    required this.color,
-  });
+  const _SocialButtonIcon({required this.assetIcon, required this.size});
 
   final String? assetIcon;
-  final IconData? iconData;
   final double size;
-  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    if (iconData != null) {
-      return Icon(iconData, size: size, color: color);
-    }
-
-    return SvgPicture.asset(
-      assetIcon!,
-      width: size,
-      height: size,
-      colorFilter:
-          color == null ? null : ColorFilter.mode(color!, BlendMode.srcIn),
-    );
+    return SvgPicture.asset(assetIcon!, width: size, height: size);
   }
 }
 
