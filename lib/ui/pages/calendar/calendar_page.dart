@@ -80,11 +80,7 @@ class CalendarPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const FigmaBottomNavBar(
-        activeTab: AppTab.home,
-        backgroundColor: AppColors.background,
-        topRadius: 0,
-      ),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.home),
     );
   }
 }

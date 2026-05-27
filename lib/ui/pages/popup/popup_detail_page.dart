@@ -54,12 +54,7 @@ class _PopupDetailPageState extends State<PopupDetailPage> {
           ],
         ),
       ),
-      bottomNavigationBar: const FigmaBottomNavBar(
-        activeTab: AppTab.home,
-        raisedHome: true,
-        backgroundColor: Color(0xFFF6F3F3),
-        topRadius: 24,
-      ),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.home),
     );
   }
 }
