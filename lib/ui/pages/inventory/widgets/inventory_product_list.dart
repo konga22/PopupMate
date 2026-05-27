@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/mock_models.dart';
+import '../../../../models/inventory_models.dart';
 import 'inventory_product_tile.dart';
 
 class InventoryProductList extends StatelessWidget {

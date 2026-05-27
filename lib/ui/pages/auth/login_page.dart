@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/assets/app_assets.dart';
 import '../../../app/router/app_page.dart';
-import '../../../services/auth/google_auth_service.dart';
+import '../../../services/google_auth_service.dart';
 import 'widgets/login_background_glow.dart';
 import 'widgets/login_design_tokens.dart';
 import 'widgets/login_divider.dart';

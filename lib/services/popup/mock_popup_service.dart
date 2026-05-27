@@ -1,4 +1,4 @@
-import '../../models/mock_models.dart';
+import '../../models/popup_models.dart';
 import 'mock_popup_data.dart';
 
 class MockPopupService {

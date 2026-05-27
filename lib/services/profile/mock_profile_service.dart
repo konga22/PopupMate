@@ -1,4 +1,4 @@
-import '../../models/mock_models.dart';
+import '../../models/profile_models.dart';
 
 class MockProfileService {
   const MockProfileService._();

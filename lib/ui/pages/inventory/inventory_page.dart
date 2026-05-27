@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/extensions/spacing_extension.dart';
-import '../../../services/popup/mock_popup_service.dart';
+import '../../../services/mock_popup_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/inventory_category_filter.dart';
 import 'widgets/inventory_product_list.dart';

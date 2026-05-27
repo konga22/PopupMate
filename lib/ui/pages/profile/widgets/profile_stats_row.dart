@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../app/extensions/spacing_extension.dart';
-import '../../../../models/mock_models.dart';
+import '../../../../models/profile_models.dart';
 import '../../../common/app_components.dart';
 
 class ProfileStatsRow extends StatelessWidget {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../models/community_models.dart';
-import '../../../services/community/community_service.dart';
-import '../../../services/community/mock_community_service.dart';
+import '../../../services/community_service.dart';
+import '../../../services/mock_community_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/community_detail_content.dart';
 

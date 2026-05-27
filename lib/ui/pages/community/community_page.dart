@@ -7,8 +7,8 @@ import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../models/community_models.dart';
-import '../../../services/community/community_service.dart';
-import '../../../services/community/mock_community_service.dart';
+import '../../../services/community_service.dart';
+import '../../../services/mock_community_service.dart';
 import '../../common/app_components.dart';
 import 'widgets/community_post_card.dart';
 

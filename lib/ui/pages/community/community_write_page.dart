@@ -5,7 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../app/extensions/context_extension.dart';
 import '../../../app/extensions/spacing_extension.dart';
 import '../../../app/theme/app_theme.dart';
-import '../../../services/community/community_service.dart';
+import '../../../services/community_service.dart';
 import '../../common/app_components.dart';
 
 class CommunityWritePage extends StatefulWidget {

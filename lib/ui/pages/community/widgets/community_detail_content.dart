@@ -4,7 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../app/extensions/spacing_extension.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../models/community_models.dart';
-import '../../../../services/community/community_service.dart';
+import '../../../../services/community_service.dart';
 import '../../../common/app_components.dart';
 import 'comment_input.dart';
 import 'comment_tile.dart';

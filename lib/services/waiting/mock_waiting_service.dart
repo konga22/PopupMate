@@ -1,4 +1,4 @@
-import '../../models/mock_models.dart';
+import '../../models/waiting_models.dart';
 
 class MockWaitingService {
   const MockWaitingService._();
