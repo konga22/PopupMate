@@ -8,6 +8,9 @@ import '../../../app/theme/app_theme.dart';
 import '../../../services/community_service.dart';
 import '../../common/app_components.dart';
 
+const _categories = ['후기', '질문', '정보', '메이트'];
+const _areas = ['전체', '성수', '홍대', '강남', '잠실', '이태원'];
+
 class CommunityWritePage extends StatefulWidget {
   const CommunityWritePage({super.key});
 
@@ -16,36 +19,59 @@ class CommunityWritePage extends StatefulWidget {
 }
 
 class _CommunityWritePageState extends State<CommunityWritePage> {
+  final _titleController = TextEditingController();
+  final _popupTitleController = TextEditingController();
   final _bodyController = TextEditingController();
+
+  String _selectedCategory = '후기';
+  String _selectedArea = '전체';
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bodyController.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _popupTitleController.dispose();
     _bodyController.dispose();
     super.dispose();
   }
 
   Future<void> _onSubmit() async {
-    if (_bodyController.text.trim().isEmpty) {
-      context.showSnackbar('게시글 내용을 입력해주세요.', isError: true);
+    final title = _titleController.text.trim();
+    final body = _bodyController.text.trim();
+
+    if (title.isEmpty) {
+      context.showSnackbar('제목을 입력해주세요.', isError: true);
+      return;
+    }
+    if (body.isEmpty) {
+      context.showSnackbar('내용을 입력해주세요.', isError: true);
       return;
     }
 
+    setState(() => _loading = true);
     try {
       await CommunityService.addPost(
-        title: '성수동 에디토리얼 팝업 후기',
-        body: _bodyController.text.trim(),
-        category: '후기',
-        area: '성수',
-        popupTitle: '성수동 에디토리얼 팝업',
+        title: title,
+        body: body,
+        category: _selectedCategory,
+        area: _selectedArea,
+        popupTitle: _popupTitleController.text.trim(),
       );
     } catch (_) {
       if (!mounted) return;
+      setState(() => _loading = false);
       context.showSnackbar('게시글 저장에 실패했습니다.', isError: true);
       return;
     }
 
     if (!mounted) return;
-    context.showSnackbar('게시글이 저장되었습니다.');
+    context.showSnackbar('게시글이 등록되었습니다.');
     context.pop();
   }
 
@@ -55,56 +81,137 @@ class _CommunityWritePageState extends State<CommunityWritePage> {
       appBar: AppTopBar(
         title: '커뮤니티 글 작성',
         showBack: true,
-        actions: [TextButton(onPressed: _onSubmit, child: const Text('저장'))],
+        actions: [
+          TextButton(
+            onPressed: _loading ? null : _onSubmit,
+            child: _loading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('등록'),
+          ),
+        ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
         children: [
-          const StatusBadge(label: '방문 완료'),
-          12.heightBox,
-          const Text(
-            '성수동 에디토리얼 팝업',
-            style: TextStyle(
-              color: AppColors.ink,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-            ),
+          _SectionLabel(label: '카테고리'),
+          8.heightBox,
+          _ChipSelector(
+            options: _categories,
+            selected: _selectedCategory,
+            onSelected: (v) => setState(() => _selectedCategory = v),
           ),
-          4.heightBox,
-          const Text(
-            '2024년 05월 24일 방문',
-            style: TextStyle(color: AppColors.muted),
+          24.heightBox,
+          _SectionLabel(label: '지역'),
+          8.heightBox,
+          _ChipSelector(
+            options: _areas,
+            selected: _selectedArea,
+            onSelected: (v) => setState(() => _selectedArea = v),
           ),
-          28.heightBox,
+          24.heightBox,
           LabelTextField(
-            label: '상세 리뷰',
-            hint: '이곳에서의 경험을 기록해 보세요.',
-            controller: _bodyController,
-            icon: LucideIcons.penLine,
-            maxLines: 8,
+            label: '제목',
+            hint: '게시글 제목을 입력하세요.',
+            controller: _titleController,
+            icon: LucideIcons.pencil,
           ),
-          10.heightBox,
+          24.heightBox,
+          LabelTextField(
+            label: '관련 팝업 (선택)',
+            hint: '관련된 팝업 이름을 입력하세요.',
+            controller: _popupTitleController,
+            icon: LucideIcons.store,
+          ),
+          24.heightBox,
+          LabelTextField(
+            label: '내용',
+            hint: '이곳에서의 경험을 자유롭게 기록해 보세요.',
+            controller: _bodyController,
+            icon: LucideIcons.fileText,
+            maxLines: 10,
+          ),
+          8.heightBox,
           Align(
             alignment: Alignment.centerRight,
             child: Text(
               '${_bodyController.text.length} / 1000',
-              style: const TextStyle(color: AppColors.muted),
+              style: const TextStyle(color: AppColors.muted, fontSize: 12),
             ),
           ),
-          28.heightBox,
-          const EmptyPlaceholder(
-            title: '리뷰 혜택',
-            message: "작성 완료 시 프로필에 '성수 에디토리얼' 배지가 부여됩니다.",
-            icon: LucideIcons.badgeCheck,
-          ),
-          24.heightBox,
+          32.heightBox,
           PrimaryButton(
-            label: '리뷰 등록하고 배지 받기',
+            label: '게시글 등록',
             icon: LucideIcons.send,
-            onPressed: _onSubmit,
+            onPressed: _loading ? null : _onSubmit,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: const TextStyle(
+        color: AppColors.ink,
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+}
+
+class _ChipSelector extends StatelessWidget {
+  const _ChipSelector({
+    required this.options,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<String> options;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((option) {
+        final isSelected = option == selected;
+        return GestureDetector(
+          onTap: () => onSelected(option),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.ink : Colors.transparent,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppColors.ink : AppColors.border,
+              ),
+            ),
+            child: Text(
+              option,
+              style: TextStyle(
+                color: isSelected ? Colors.white : AppColors.muted,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
