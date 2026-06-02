@@ -1,21 +1,22 @@
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../app/extensions/context_extension.dart';
 import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../models/popup_models.dart';
 import '../../../services/location_service.dart';
-import 'widgets/map_search_bar.dart';
-import 'widgets/map_bottom_nav_bar.dart';
-import 'widgets/map_floating_controls.dart';
-import 'widgets/map_quick_preview_card.dart';
-import 'widgets/map_naver_view.dart';
-import 'widgets/map_filter_bottom_sheet.dart';
-import '../../../models/map_mock_data.dart';
+import '../../../services/popup/mock_popup_service.dart';
+import '../../common/navigation/app_bottom_nav_bar.dart';
+import 'widgets/map_filter_sheet.dart';
+import 'widgets/map_header.dart';
+import 'widgets/map_viewport.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -31,62 +32,222 @@ class _MapPageState extends State<MapPage> {
   bool _saved = false;
   NLatLng _currentCenter = const NLatLng(37.5445, 127.0560); // 성수동 중심 좌표
 
-  String? _selectedCategory;
-  bool? _isReservationAvailable;
-  Map<String, dynamic>? _selectedPopup;
+  final Set<String> _selectedCategories = {};
+  PopupStatus? _isOperatingFilter;
+  Popup? _selectedPopup;
 
-  final _searchController = TextEditingController();
-  String _currentInput = '';
-  String? _searchQuery;
+  final Map<String, NOverlayImage> _categoryMarkerIcons = {};
+  final String _sessionKey = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   void initState() {
     super.initState();
-    _selectedPopup = MapMockData.popups.isNotEmpty ? MapMockData.popups.first : null;
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  List<Map<String, dynamic>> get _suggestions {
-    if (_currentInput.isEmpty) return [];
-    return MapMockData.popups
-        .where((p) => (p['title'] as String).toLowerCase().contains(_currentInput.toLowerCase()))
-        .toList();
-  }
-
-  void _submitSearch(String query) {
-    setState(() {
-      _searchQuery = query;
-      _currentInput = '';
-      _searchController.text = query;
-    });
-    FocusScope.of(context).unfocus();
-  }
-
-  String _getDistanceLabel(NLatLng pos) {
-    final distance = Geolocator.distanceBetween(
-      _currentCenter.latitude,
-      _currentCenter.longitude,
-      pos.latitude,
-      pos.longitude,
+    _selectedPopup = MockPopupService.popups.firstWhere(
+      (p) => p.id == 'aromatic-cloud',
+      orElse: () => MockPopupService.popups.first,
     );
-    if (distance < 1000) {
-      return '${distance.round()}m away';
-    } else {
-      return '${(distance / 1000).toStringAsFixed(1)}km away';
+    _loadMarkerIcons();
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    final categories = ['패션', '뷰티', '리빙', '음식', '테크', '연예', '캐릭터', '웹툰', '애니'];
+    for (final category in categories) {
+      try {
+        final iconData = _markerIconForCategory(category);
+        final pinColor = _colorForCategory(category);
+        
+        // Draw and write the premium pin file using Canvas and TextPainter
+        final file = await _createPremiumPinFile(category, iconData, pinColor);
+        final overlayImage = NOverlayImage.fromFile(file);
+        
+        if (mounted) {
+          setState(() {
+            _categoryMarkerIcons[category] = overlayImage;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error drawing custom marker for $category: $e');
+      }
     }
+  }
+
+  static IconData _markerIconForCategory(String category) {
+    return LucideIcons.store; // 실제 네이버 지도처럼 모든 팝업스토어에 상점/쇼핑백 아이콘 적용
+  }
+
+  static Color _colorForCategory(String category) {
+    return const Color(0xFFF24822); // 실제 네이버 지도 팝업스토어 전용 레드-오렌지 색상 적용
+  }
+
+  Future<File> _createPremiumPinFile(String category, IconData iconData, Color pinColor) async {
+    const double width = 120.0;
+    const double height = 120.0;
+    
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, width, height));
+    
+    // Naver Map Style Pin Path (Circle center 60, 52, radius 32, bottom tip 60, 90)
+    final path = Path();
+    path.moveTo(36, 70);
+    path.arcToPoint(
+      const Offset(84, 70),
+      radius: const Radius.circular(32),
+      clockwise: true,
+      largeArc: true,
+    );
+    path.lineTo(60, 90);
+    path.lineTo(36, 70);
+    path.close();
+    
+    // 1. 입체감을 주는 드롭 섀도우 (Drop Shadow)
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawPath(path.shift(const Offset(0, 3.5)), shadowPaint);
+    
+    // 2. 단색 채우기 (Solid color fill)
+    final fillPaint = Paint()
+      ..color = pinColor
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(path, fillPaint);
+    
+    // 3. 선명한 흰색 외곽 테두리 (Stroke)
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0
+      ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(path, borderPaint);
+    
+    // 4. Lucide 아이콘 그리기 (TextPainter) - 흰색으로 중심 배치
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    textPainter.text = TextSpan(
+      text: String.fromCharCode(iconData.codePoint),
+      style: TextStyle(
+        fontSize: 28.0,
+        fontFamily: iconData.fontFamily,
+        package: iconData.fontPackage,
+        color: Colors.white, // 흰색 아이콘
+      ),
+    );
+    textPainter.layout();
+    
+    final offset = Offset(
+      60.0 - textPainter.width / 2,
+      52.0 - textPainter.height / 2,
+    );
+    textPainter.paint(canvas, offset);
+    
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(width.toInt(), height.toInt());
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    final bytes = byteData!.buffer.asUint8List();
+    
+    final tempDir = Directory.systemTemp;
+    final file = File('${tempDir.path}/premium_pin_${category}_$_sessionKey.png');
+    await file.writeAsBytes(bytes, flush: true);
+    return file;
   }
 
   String get _radiusLabel => '${_radius}m';
 
+  List<Popup> get _filteredPopups {
+    return MockPopupService.popups.where((popup) {
+      // 1. Category Filter
+      if (_selectedCategories.isNotEmpty &&
+          !_selectedCategories.contains(popup.category)) {
+        return false;
+      }
+      // 2. Operating Status Filter
+      if (_isOperatingFilter != null &&
+          popup.status != _isOperatingFilter) {
+        return false;
+      }
+      // 3. Distance/Radius Filter
+      if (popup.latitude != null && popup.longitude != null) {
+        final distance = Geolocator.distanceBetween(
+          _currentCenter.latitude,
+          _currentCenter.longitude,
+          popup.latitude!,
+          popup.longitude!,
+        );
+        if (distance > _radius) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
   void _selectRadius(int value) {
     setState(() {
       _radius = value;
+
+      // Update selected popup based on the new filtered list
+      final filtered = _filteredPopups;
+      if (filtered.isEmpty) {
+        _selectedPopup = null;
+      } else if (_selectedPopup == null || !filtered.contains(_selectedPopup)) {
+        _selectedPopup = filtered.first;
+      }
     });
+  }
+
+  void _onSearch(String query) {
+    debugPrint('Search query: $query');
+  }
+
+  Future<void> _moveToCurrentLocation() async {
+    try {
+      context.showSnackbar('위치 정보를 가져오는 중...');
+      final position = await LocationService.getCurrentPosition();
+
+      if (!mounted) return;
+      setState(() {
+        _currentCenter = NLatLng(position.latitude, position.longitude);
+        _radius = 500;
+      });
+      context.showSnackbar(
+        '현재 위치: 위도 ${position.latitude.toStringAsFixed(4)}, 경도 ${position.longitude.toStringAsFixed(4)}',
+      );
+    } catch (error) {
+      if (!mounted) return;
+      context.showSnackbar(error.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  void _toggleSaved() {
+    setState(() => _saved = !_saved);
+  }
+
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return MapFilterSheet(
+          initialSelectedCategories: _selectedCategories,
+          initialIsOperating: _isOperatingFilter,
+          onApply: (categories, isOperating) {
+            setState(() {
+              _selectedCategories.clear();
+              _selectedCategories.addAll(categories);
+              _isOperatingFilter = isOperating;
+
+              // Update selected popup based on the new filtered list
+              final filtered = _filteredPopups;
+              if (filtered.isEmpty) {
+                _selectedPopup = null;
+              } else if (_selectedPopup == null ||
+                  !filtered.contains(_selectedPopup)) {
+                _selectedPopup = filtered.first;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -97,217 +258,39 @@ class _MapPageState extends State<MapPage> {
         bottom: false,
         child: Column(
           children: [
-            const _MapHeader(),
+            const MapHeader(),
             Expanded(
-              child: Stack(
-                children: [
-                  // 1. 네이버 지도 뷰
-                  Positioned.fill(
-                    child: MapNaverView(
-                      center: _currentCenter,
-                      radius: _radius.toDouble(),
-                      selectedCategory: _selectedCategory,
-                      isReservationAvailable: _isReservationAvailable,
-                      searchQuery: _searchQuery,
-                      onMarkerTap: (popup) {
-                        setState(() {
-                          _selectedPopup = popup;
-                        });
-                      },
-                    ),
-                  ),
-
-                  // 2. 지도 위의 상단 검색창 및 컨트롤들
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    top: 16,
-                    child: Column(
-                      children: [
-                        MapSearchBar(
-                          controller: _searchController,
-                          onChanged: (val) {
-                            setState(() {
-                              _currentInput = val;
-                              if (val.isEmpty) _searchQuery = null; // Clear filter if search is empty
-                            });
-                          },
-                          onSearch: _submitSearch,
-                          onFilterTap: () async {
-                            final result = await showModalBottomSheet<MapFilterResult>(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) => MapFilterBottomSheet(
-                                initialCategory: _selectedCategory,
-                                initialReservationAvailable: _isReservationAvailable,
-                              ),
-                            );
-                            if (result != null) {
-                              setState(() {
-                                _selectedCategory = result.category;
-                                _isReservationAvailable = result.isReservationAvailable;
-                              });
-                            }
-                          },
-                        ),
-                        if (_currentInput.isNotEmpty && _suggestions.isNotEmpty)
-                          Container(
-                            margin: const EdgeInsets.only(top: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x0D000000),
-                                  blurRadius: 4,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: _suggestions.map((p) {
-                                return ListTile(
-                                  leading: const Icon(LucideIcons.search, size: 16, color: AppColors.body),
-                                  title: Text(
-                                    p['title'] as String,
-                                    style: const TextStyle(fontSize: 14, color: AppColors.ink),
-                                  ),
-                                  dense: true,
-                                  onTap: () => _submitSearch(p['title'] as String),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        const SizedBox(height: 16),
-                        MapFloatingControls(
-                          radiusLabel: _radiusLabel,
-                          radiusOptions: _radiusOptions,
-                          selectedRadius: _radius,
-                          onRadiusSelected: _selectRadius,
-                          onCurrentLocationTap: () async {
-                            try {
-                              context.showSnackbar('위치 정보를 가져오는 중...');
-                              final position =
-                                  await LocationService.getCurrentPosition();
-
-                              if (!context.mounted) return;
-                              setState(() {
-                                _currentCenter = NLatLng(
-                                  position.latitude,
-                                  position.longitude,
-                                );
-                                _radius = 500;
-                              });
-                              context.showSnackbar(
-                                '현재 위치: 위도 ${position.latitude.toStringAsFixed(4)}, 경도 ${position.longitude.toStringAsFixed(4)}',
-                              );
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              context.showSnackbar(
-                                e.toString().replaceAll('Exception: ', ''),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // 3. 지도 위의 하단 프리뷰 카드
-                  if (_selectedPopup != null)
-                    Positioned(
-                      left: 20,
-                      right: 20,
-                      bottom: 32,
-                      child: MapQuickPreviewCard(
-                        popup: _selectedPopup!,
-                        distanceLabel: _getDistanceLabel(_selectedPopup!['pos'] as NLatLng),
-                        saved: _saved,
-                        onWaitingTap: () => context.pushNamed(AppPage.waiting.name),
-                        onSaveTap: () => setState(() => _saved = !_saved),
-                      ),
-                    ),
-                ],
+              child: MapViewport(
+                center: _currentCenter,
+                radius: _radius,
+                radiusLabel: _radiusLabel,
+                radiusOptions: _radiusOptions,
+                saved: _saved,
+                onSearch: _onSearch,
+                onRadiusSelected: _selectRadius,
+                onCurrentLocationTap: _moveToCurrentLocation,
+                onWaitingTap: () => context.pushNamed(AppPage.waiting.name),
+                onSaveTap: _toggleSaved,
+                filteredPopups: _filteredPopups,
+                selectedPopup: _selectedPopup,
+                onPopupSelected: (popup) {
+                  setState(() {
+                    _selectedPopup = popup;
+                  });
+                },
+                onFilterTap: _showFilterSheet,
+                categoryMarkerIcons: _categoryMarkerIcons,
+                onCenterChanged: (newCenter) {
+                  setState(() {
+                    _currentCenter = newCenter;
+                  });
+                },
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: const MapBottomNavBar(activeTab: AppTab.map),
-    );
-  }
-}
-
-class _MapHeader extends StatelessWidget {
-  const _MapHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
-      ),
-      child: Row(
-        children: [
-          _IconTapTarget(
-            icon: LucideIcons.arrowLeft,
-            iconSize: 22,
-            onTap: () {
-              if (context.canPop()) {
-                context.pop();
-                return;
-              }
-
-              context.goNamed(AppPage.home.name);
-            },
-          ),
-          const Expanded(
-            child: Text(
-              '주변 팝업',
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AppColors.ink,
-                fontSize: 20,
-                height: 1.4,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          _IconTapTarget(icon: LucideIcons.share2, iconSize: 21, onTap: () {}),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconTapTarget extends StatelessWidget {
-  const _IconTapTarget({
-    required this.icon,
-    required this.onTap,
-    this.iconSize = 20,
-  });
-
-  final IconData icon;
-  final VoidCallback onTap;
-  final double iconSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: SizedBox(
-        width: 44,
-        height: 44,
-        child: Icon(icon, color: AppColors.ink, size: iconSize),
-      ),
+      bottomNavigationBar: const AppBottomNavBar(activeTab: AppTab.map),
     );
   }
 }

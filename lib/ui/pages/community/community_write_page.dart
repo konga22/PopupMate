@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../app/extensions/context_extension.dart';
 import '../../../app/extensions/spacing_extension.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../services/community_service.dart';
 import '../../common/app_components.dart';
 
 class CommunityWritePage extends StatefulWidget {
@@ -23,12 +24,28 @@ class _CommunityWritePageState extends State<CommunityWritePage> {
     super.dispose();
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     if (_bodyController.text.trim().isEmpty) {
       context.showSnackbar('게시글 내용을 입력해주세요.', isError: true);
       return;
     }
-    context.showSnackbar('mock 게시글이 저장되었습니다.');
+
+    try {
+      await CommunityService.addPost(
+        title: '성수동 에디토리얼 팝업 후기',
+        body: _bodyController.text.trim(),
+        category: '후기',
+        area: '성수',
+        popupTitle: '성수동 에디토리얼 팝업',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      context.showSnackbar('게시글 저장에 실패했습니다.', isError: true);
+      return;
+    }
+
+    if (!mounted) return;
+    context.showSnackbar('게시글이 저장되었습니다.');
     context.pop();
   }
 

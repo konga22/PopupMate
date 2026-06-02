@@ -6,6 +6,7 @@ class AppAssets {
 
   static const loginKakao = 'assets/images/login_kakao.png';
   static const loginApple = 'assets/images/login_apple.png';
+  static const loginGoogle = 'assets/images/login_google.svg';
   static const loginClose = 'assets/images/login_close.png';
 
   static const homeProfile = 'assets/images/home_profile.png';

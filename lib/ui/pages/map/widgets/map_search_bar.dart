@@ -5,36 +5,20 @@ import '../../../../app/theme/app_theme.dart';
 
 class MapSearchBar extends StatefulWidget {
   final ValueChanged<String>? onSearch;
-  final ValueChanged<String>? onChanged;
   final VoidCallback? onFilterTap;
-  final TextEditingController? controller;
 
-  const MapSearchBar({
-    super.key,
-    this.onSearch,
-    this.onChanged,
-    this.onFilterTap,
-    this.controller,
-  });
+  const MapSearchBar({super.key, this.onSearch, this.onFilterTap});
 
   @override
   State<MapSearchBar> createState() => _MapSearchBarState();
 }
 
 class _MapSearchBarState extends State<MapSearchBar> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = widget.controller ?? TextEditingController();
-  }
+  final _controller = TextEditingController();
 
   @override
   void dispose() {
-    if (widget.controller == null) {
-      _controller.dispose();
-    }
+    _controller.dispose();
     super.dispose();
   }
 
@@ -64,7 +48,6 @@ class _MapSearchBarState extends State<MapSearchBar> {
               controller: _controller,
               textInputAction: TextInputAction.search,
               onSubmitted: widget.onSearch,
-              onChanged: widget.onChanged,
               decoration: const InputDecoration(
                 hintText: '성수동 팝업스토어 검색',
                 hintStyle: TextStyle(
@@ -87,11 +70,15 @@ class _MapSearchBarState extends State<MapSearchBar> {
           ),
           const SizedBox(width: 8),
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: widget.onFilterTap,
-            child: const Icon(
-              LucideIcons.slidersHorizontal,
-              size: 20,
-              color: AppColors.ink,
+            child: const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Icon(
+                LucideIcons.slidersHorizontal,
+                size: 20,
+                color: AppColors.ink,
+              ),
             ),
           ),
         ],
