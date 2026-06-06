@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MapPreviewImage extends StatelessWidget {
-  const MapPreviewImage({
-    super.key,
-    required this.imagePath,
-  });
+  const MapPreviewImage({super.key, required this.imagePath});
 
   final String imagePath;
 

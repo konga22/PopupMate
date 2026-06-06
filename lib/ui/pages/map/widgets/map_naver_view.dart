@@ -43,7 +43,10 @@ class _MapNaverViewState extends State<MapNaverView> {
       if (oldWidget.center != widget.center ||
           oldWidget.radius != widget.radius ||
           !listEquals(oldWidget.filteredPopups, widget.filteredPopups) ||
-          !mapEquals(oldWidget.categoryMarkerIcons, widget.categoryMarkerIcons)) {
+          !mapEquals(
+            oldWidget.categoryMarkerIcons,
+            widget.categoryMarkerIcons,
+          )) {
         _updateOverlays();
         if (oldWidget.center != widget.center ||
             oldWidget.radius != widget.radius) {
@@ -78,10 +81,7 @@ class _MapNaverViewState extends State<MapNaverView> {
     }
 
     _mapController!.updateCamera(
-      NCameraUpdate.withParams(
-        target: widget.center,
-        zoom: targetZoom,
-      ),
+      NCameraUpdate.withParams(target: widget.center, zoom: targetZoom),
     );
   }
 

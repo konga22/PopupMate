@@ -17,7 +17,9 @@ Future<void> main() async {
   if (_naverMapClientId.isNotEmpty) {
     await FlutterNaverMap().init(clientId: _naverMapClientId);
   } else {
-    debugPrint('Warning: Naver Map Client ID is empty. Map initialization skipped.');
+    debugPrint(
+      'Warning: Naver Map Client ID is empty. Map initialization skipped.',
+    );
   }
 
   runApp(const AppRoot());

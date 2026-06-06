@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 enum PopupStatus {
   openingSoon, // 오픈예정
-  inProgress,  // 진행중
-  ended,       // 종료
+  inProgress, // 진행중
+  ended, // 종료
 }
 
 class Popup {

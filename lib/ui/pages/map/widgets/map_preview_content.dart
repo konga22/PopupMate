@@ -21,7 +21,8 @@ class MapPreviewContent extends StatelessWidget {
             MapPreviewBadge(
               label: switch (popup.status) {
                 PopupStatus.openingSoon => '오픈예정',
-                PopupStatus.inProgress => popup.heroLabel.isNotEmpty ? popup.heroLabel : '진행중',
+                PopupStatus.inProgress =>
+                  popup.heroLabel.isNotEmpty ? popup.heroLabel : '진행중',
                 PopupStatus.ended => '종료',
               },
             ),
