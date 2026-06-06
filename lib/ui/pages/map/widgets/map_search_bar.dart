@@ -5,8 +5,9 @@ import '../../../../app/theme/app_theme.dart';
 
 class MapSearchBar extends StatefulWidget {
   final ValueChanged<String>? onSearch;
+  final VoidCallback? onFilterTap;
 
-  const MapSearchBar({super.key, this.onSearch});
+  const MapSearchBar({super.key, this.onSearch, this.onFilterTap});
 
   @override
   State<MapSearchBar> createState() => _MapSearchBarState();
@@ -68,10 +69,17 @@ class _MapSearchBarState extends State<MapSearchBar> {
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(
-            LucideIcons.slidersHorizontal,
-            size: 20,
-            color: AppColors.ink,
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onFilterTap,
+            child: const Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Icon(
+                LucideIcons.slidersHorizontal,
+                size: 20,
+                color: AppColors.ink,
+              ),
+            ),
           ),
         ],
       ),

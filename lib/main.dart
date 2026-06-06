@@ -13,8 +13,13 @@ Future<void> main() async {
 
   await _initializeFirebase();
 
+  debugPrint('Naver Map Client ID: $_naverMapClientId');
   if (_naverMapClientId.isNotEmpty) {
     await FlutterNaverMap().init(clientId: _naverMapClientId);
+  } else {
+    debugPrint(
+      'Warning: Naver Map Client ID is empty. Map initialization skipped.',
+    );
   }
 
   runApp(const AppRoot());

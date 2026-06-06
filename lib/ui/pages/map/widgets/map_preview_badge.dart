@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_theme.dart';
 
 class MapPreviewBadge extends StatelessWidget {
-  const MapPreviewBadge({super.key});
+  final String label;
+
+  const MapPreviewBadge({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +17,9 @@ class MapPreviewBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(2),
         border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
       ),
-      child: const Text(
-        'NEW',
-        style: TextStyle(
+      child: Text(
+        label,
+        style: const TextStyle(
           color: AppColors.ink,
           fontSize: 12,
           height: 1.33,

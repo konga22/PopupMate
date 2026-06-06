@@ -6,8 +6,12 @@ import '../../../app/extensions/context_extension.dart';
 import '../../../app/router/app_page.dart';
 import '../../../app/router/app_tab.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../models/popup_models.dart';
 import '../../../services/location_service.dart';
+import '../../../services/popup/mock_popup_service.dart';
 import '../../common/navigation/app_bottom_nav_bar.dart';
+import 'helpers/map_marker_helper.dart';
+import 'widgets/map_filter_sheet.dart';
 import 'widgets/map_header.dart';
 import 'widgets/map_viewport.dart';
 
@@ -19,17 +23,65 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  static const _radiusOptions = [100, 500, 1000];
+  static const _radiusOptions = [100, 250, 500];
 
   int _radius = 500;
   bool _saved = false;
   NLatLng _currentCenter = const NLatLng(37.5445, 127.0560); // 성수동 중심 좌표
 
-  String get _radiusLabel => _radius == 1000 ? '1km' : '${_radius}m';
+  final Set<String> _selectedCategories = {};
+  PopupStatus? _isOperatingFilter;
+  Popup? _selectedPopup;
+
+  final Map<String, NOverlayImage> _categoryMarkerIcons = {};
+  final String _sessionKey = DateTime.now().millisecondsSinceEpoch.toString();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPopup = MockPopupService.popups.firstWhere(
+      (p) => p.id == 'aromatic-cloud',
+      orElse: () => MockPopupService.popups.first,
+    );
+    _loadMarkerIcons();
+  }
+
+  Future<void> _loadMarkerIcons() async {
+    try {
+      final icons = await MapMarkerHelper.loadMarkerIcons(_sessionKey);
+      if (mounted) {
+        setState(() {
+          _categoryMarkerIcons.addAll(icons);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading marker icons: $e');
+    }
+  }
+
+  String get _radiusLabel => '${_radius}m';
+
+  List<Popup> get _filteredPopups {
+    return MockPopupService.getFilteredPopups(
+      selectedCategories: _selectedCategories,
+      isOperatingFilter: _isOperatingFilter,
+      currentLatitude: _currentCenter.latitude,
+      currentLongitude: _currentCenter.longitude,
+      radius: _radius,
+    );
+  }
 
   void _selectRadius(int value) {
     setState(() {
       _radius = value;
+
+      // Update selected popup based on the new filtered list
+      final filtered = _filteredPopups;
+      if (filtered.isEmpty) {
+        _selectedPopup = null;
+      } else if (_selectedPopup == null || !filtered.contains(_selectedPopup)) {
+        _selectedPopup = filtered.first;
+      }
     });
   }
 
@@ -60,6 +112,36 @@ class _MapPageState extends State<MapPage> {
     setState(() => _saved = !_saved);
   }
 
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return MapFilterSheet(
+          initialSelectedCategories: _selectedCategories,
+          initialIsOperating: _isOperatingFilter,
+          onApply: (categories, isOperating) {
+            setState(() {
+              _selectedCategories.clear();
+              _selectedCategories.addAll(categories);
+              _isOperatingFilter = isOperating;
+
+              // Update selected popup based on the new filtered list
+              final filtered = _filteredPopups;
+              if (filtered.isEmpty) {
+                _selectedPopup = null;
+              } else if (_selectedPopup == null ||
+                  !filtered.contains(_selectedPopup)) {
+                _selectedPopup = filtered.first;
+              }
+            });
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +163,20 @@ class _MapPageState extends State<MapPage> {
                 onCurrentLocationTap: _moveToCurrentLocation,
                 onWaitingTap: () => context.pushNamed(AppPage.waiting.name),
                 onSaveTap: _toggleSaved,
+                filteredPopups: _filteredPopups,
+                selectedPopup: _selectedPopup,
+                onPopupSelected: (popup) {
+                  setState(() {
+                    _selectedPopup = popup;
+                  });
+                },
+                onFilterTap: _showFilterSheet,
+                categoryMarkerIcons: _categoryMarkerIcons,
+                onCenterChanged: (newCenter) {
+                  setState(() {
+                    _currentCenter = newCenter;
+                  });
+                },
               ),
             ),
           ],

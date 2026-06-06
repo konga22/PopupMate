@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_theme.dart';
+import '../../../../models/popup_models.dart';
 import 'map_preview_actions.dart';
 import 'map_preview_content.dart';
 import 'map_preview_image.dart';
 
 class MapQuickPreviewCard extends StatelessWidget {
+  final Popup popup;
   final bool saved;
   final VoidCallback onWaitingTap;
   final VoidCallback onSaveTap;
 
   const MapQuickPreviewCard({
     super.key,
+    required this.popup,
     required this.saved,
     required this.onWaitingTap,
     required this.onSaveTap,
@@ -39,9 +42,9 @@ class MapQuickPreviewCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const MapPreviewImage(),
+                MapPreviewImage(imagePath: popup.imagePath),
                 const SizedBox(width: 16),
-                const Expanded(child: MapPreviewContent()),
+                Expanded(child: MapPreviewContent(popup: popup)),
               ],
             ),
           ),

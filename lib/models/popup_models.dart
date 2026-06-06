@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+enum PopupStatus {
+  openingSoon, // 오픈예정
+  inProgress, // 진행중
+  ended, // 종료
+}
+
 class Popup {
   const Popup({
     required this.id,
@@ -17,6 +23,11 @@ class Popup {
     required this.dday,
     required this.tags,
     required this.colors,
+    required this.imagePath,
+    required this.status,
+    this.latitude,
+    this.longitude,
+    this.isOperating = true,
   });
 
   final String id;
@@ -34,6 +45,11 @@ class Popup {
   final String dday;
   final List<String> tags;
   final List<Color> colors;
+  final String imagePath;
+  final PopupStatus status;
+  final double? latitude;
+  final double? longitude;
+  final bool isOperating;
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -50,6 +66,11 @@ class Popup {
     'distance': distance,
     'dday': dday,
     'tags': tags,
+    'imagePath': imagePath,
+    'status': status.name,
+    'latitude': latitude,
+    'longitude': longitude,
+    'isOperating': isOperating,
   };
 }
 

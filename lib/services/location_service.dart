@@ -30,4 +30,19 @@ class LocationService {
     // 모든 권한이 확인되면 현재 위치를 가져와 반환합니다.
     return await Geolocator.getCurrentPosition();
   }
+
+  /// 두 GPS 좌표 간의 거리를 계산하여 미터(m) 단위로 반환합니다.
+  static double calculateDistance(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) {
+    return Geolocator.distanceBetween(
+      startLatitude,
+      startLongitude,
+      endLatitude,
+      endLongitude,
+    );
+  }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/assets/app_assets.dart';
-
 class MapPreviewImage extends StatelessWidget {
-  const MapPreviewImage({super.key});
+  const MapPreviewImage({super.key, required this.imagePath});
+
+  final String imagePath;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class MapPreviewImage extends StatelessWidget {
           maxHeight: 80,
           alignment: Alignment.center,
           child: Image.asset(
-            AppAssets.mapPreview,
+            imagePath,
             width: 243,
             height: 80,
             fit: BoxFit.cover,

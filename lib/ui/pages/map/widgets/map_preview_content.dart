@@ -1,28 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_theme.dart';
+import '../../../../models/popup_models.dart';
 import 'map_preview_badge.dart';
 
 class MapPreviewContent extends StatelessWidget {
-  const MapPreviewContent({super.key});
+  final Popup popup;
+
+  const MapPreviewContent({super.key, required this.popup});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            MapPreviewBadge(),
+            MapPreviewBadge(
+              label: switch (popup.status) {
+                PopupStatus.openingSoon => '오픈예정',
+                PopupStatus.inProgress =>
+                  popup.heroLabel.isNotEmpty ? popup.heroLabel : '진행중',
+                PopupStatus.ended => '종료',
+              },
+            ),
             Flexible(
               child: Text(
-                '200m away',
+                popup.distance,
                 textAlign: TextAlign.right,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF45474B),
                   fontSize: 12,
                   height: 1.33,
@@ -33,12 +43,12 @@ class MapPreviewContent extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
-          'Aromatic Cloud Popup',
+          popup.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.ink,
             fontSize: 20,
             height: 1.4,
@@ -46,10 +56,10 @@ class MapPreviewContent extends StatelessWidget {
           ),
         ),
         Text(
-          '성수동 2가 314-1',
+          popup.address,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: const TextStyle(
             color: Color(0xFF45474B),
             fontSize: 14,
             height: 1.43,
